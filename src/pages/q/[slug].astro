@@ -1,0 +1,44 @@
+---
+// SEO satellite pages: common streamer queries ("net worth", "real name",
+// "platforms", "banned") rendered as thin landing pages that 301 to the
+// relevant anchor on the main entity page with a proper canonical.
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const streamers = await getCollection('streamers');
+  const variants = [
+    { suffix: 'net-worth', anchor: '#records', keyword: 'Net worth' },
+    { suffix: 'real-name', anchor: '#faq', keyword: 'Real name' },
+    { suffix: 'stats', anchor: '#records', keyword: 'Stats' },
+    { suffix: 'banned', anchor: '#controversies', keyword: 'Banned' },
+    { suffix: 'age', anchor: '#faq', keyword: 'Age' },
+  ];
+  const paths: any[] = [];
+  for (const s of streamers) {
+    for (const v of variants) {
+      paths.push({
+        params: { slug: `${s.id}-${v.suffix}` },
+        props: { streamer: s, variant: v },
+      });
+    }
+  }
+  return paths;
+}
+
+const { streamer, variant } = Astro.props as any;
+const target = `/streamer/${streamer.id}/${variant.anchor}`;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{streamer.data.name} {variant.keyword.toLowerCase()}</title>
+    <meta name="robots" content="noindex, follow" />
+    <link rel="canonical" href={`https://streamers.wiki/streamer/${streamer.id}/`} />
+    <meta http-equiv="refresh" content={`0; url=${target}`} />
+    <script is:inline define:vars={{ target }}>window.location.replace(target);</script>
+  </head>
+  <body>
+    <p>Redirecting to <a href={target}>{target}</a>…</p>
+  </body>
+</html>

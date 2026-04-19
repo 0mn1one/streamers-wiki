@@ -51,6 +51,14 @@ const jsonLd = {
   url: new URL(Astro.url.pathname, 'https://streamers.wiki').toString(),
   sameAs: Object.values(d.handles || {}),
 };
+
+const seoName = d.real_name && d.real_name !== d.name ? `${d.name} (${d.real_name})` : d.name;
+const seoQualifiers: string[] = [];
+if (d.primary_platform) seoQualifiers.push(d.primary_platform);
+seoQualifiers.push('Real Name', 'Net Worth');
+if (d.followers) seoQualifiers.push('Followers');
+seoQualifiers.push('Stats');
+const seoTitle = `${seoName} — ${seoQualifiers.join(', ')} | Streamers.wiki`;
 ---
 <WikiLayout
   type="streamers"
@@ -65,6 +73,7 @@ const jsonLd = {
   headings={headings}
   hideDefaultHeader={true}
   themeStyle={themeStyle}
+  seoTitle={seoTitle}
 >
   <StreamerHero entry={entry} />
 

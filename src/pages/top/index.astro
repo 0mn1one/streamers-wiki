@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const lists = [
+  { slug: 'most-followed', label: 'Most-followed streamers', note: 'All platforms, top 50' },
+  { slug: 'twitch-streamers', label: 'Top Twitch streamers', note: 'Most-followed on Twitch' },
+  { slug: 'youtube-streamers', label: 'Top YouTube Live streamers', note: 'Most-followed on YouTube Live' },
+  { slug: 'kick-streamers', label: 'Top Kick streamers', note: 'Most-followed on Kick' },
+  { slug: 'vtubers', label: 'Top VTubers', note: 'Hololive, Nijisanji, VShojo, indie' },
+  { slug: 'spanish-streamers', label: 'Top Spanish streamers', note: 'Ibai, Rubius, Auron, Grefg…' },
+  { slug: 'brazilian-streamers', label: 'Top Brazilian streamers', note: 'Portuguese-language' },
+  { slug: 'just-chatting', label: 'Top Just Chatting', note: 'Variety / Just Chatting' },
+  { slug: 'fps-streamers', label: 'Top FPS streamers', note: 'Valorant, CS, Apex, COD' },
+];
+---
+<BaseLayout title="Top lists" description="Ranked lists of the biggest streamers across every category, platform and language." seoTitle="Top Streamer Lists 2026 — Most Followed, Platforms, Genres | Streamers.wiki">
+  <section class="hero" style="padding:3rem 0 1.8rem;">
+    <div class="container">
+      <h1>Top lists</h1>
+      <p>The biggest streamers in every category, ranked.</p>
+    </div>
+  </section>
+  <div class="container" style="padding:2rem 0;">
+    <div class="grid">
+      {lists.map((l) => (
+        <a href={`/top/${l.slug}/`} class="card" style="display:block;color:var(--text);">
+          <h3 style="margin:0;font-family:var(--display);font-size:1.1rem;">{l.label}</h3>
+          <p class="muted small" style="margin:0.3rem 0 0;">{l.note}</p>
+        </a>
+      ))}
+    </div>
+  </div>
+</BaseLayout>

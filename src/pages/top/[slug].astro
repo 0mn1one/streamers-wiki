@@ -1,0 +1,125 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { entryUrl } from '../../lib/links';
+
+export async function getStaticPaths() {
+  const SPECS = [
+    { slug: 'most-followed', title: 'Most-followed streamers', h1: 'Most-followed streamers',
+      seoTitle: 'Most Followed Streamers 2026 Top 50 Streamers.wiki',
+      description: 'The most-followed streamers across every platform, 2026.',
+      filterKind: 'none', filterValue: '', limit: 50 },
+    { slug: 'twitch-streamers', title: 'Top Twitch streamers', h1: 'Top Twitch streamers',
+      seoTitle: 'Top Twitch Streamers 2026 Streamers.wiki',
+      description: 'The most-followed creators whose primary platform is Twitch.',
+      filterKind: 'platform', filterValue: 'twitch', limit: 40 },
+    { slug: 'kick-streamers', title: 'Top Kick streamers', h1: 'Top Kick streamers',
+      seoTitle: 'Top Kick Streamers 2026 Streamers.wiki',
+      description: 'The most-followed creators whose primary platform is Kick.',
+      filterKind: 'platform', filterValue: 'kick', limit: 40 },
+    { slug: 'vtubers', title: 'Top VTubers', h1: 'Top VTubers',
+      seoTitle: 'Top VTubers 2026 Streamers.wiki',
+      description: 'The most-followed VTubers across every agency and the indie scene.',
+      filterKind: 'tag', filterValue: 'vtuber', limit: 40 },
+    { slug: 'spanish-streamers', title: 'Top Spanish-language streamers', h1: 'Top Spanish-language streamers',
+      seoTitle: 'Top Spanish Streamers 2026 Streamers.wiki',
+      description: 'The most-followed Spanish-language creators.',
+      filterKind: 'nationality', filterValue: 'spanish', limit: 40 },
+    { slug: 'brazilian-streamers', title: 'Top Brazilian streamers', h1: 'Top Brazilian streamers',
+      seoTitle: 'Top Brazilian Streamers 2026 Streamers.wiki',
+      description: 'The most-followed Brazilian creators.',
+      filterKind: 'nationality', filterValue: 'brazilian', limit: 40 },
+    { slug: 'just-chatting', title: 'Top Just Chatting streamers', h1: 'Top Just Chatting streamers',
+      seoTitle: 'Top Just Chatting Streamers 2026 Streamers.wiki',
+      description: 'The biggest Just Chatting creators.',
+      filterKind: 'tag', filterValue: 'just-chatting', limit: 40 },
+    { slug: 'fps-streamers', title: 'Top FPS streamers', h1: 'Top FPS streamers',
+      seoTitle: 'Top FPS Streamers 2026 Streamers.wiki',
+      description: 'The most-watched FPS creators.',
+      filterKind: 'tag', filterValue: 'fps', limit: 40 },
+    { slug: 'youtube-streamers', title: 'Top YouTube Live streamers', h1: 'Top YouTube Live streamers',
+      seoTitle: 'Top YouTube Live Streamers 2026 Streamers.wiki',
+      description: 'The most-followed creators on YouTube Live.',
+      filterKind: 'platform-regex', filterValue: 'youtube', limit: 40 },
+  ];
+
+  const streamers = await getCollection('streamers');
+
+  return SPECS.map((spec) => {
+    let list = streamers;
+    if (spec.filterKind === 'platform') {
+      list = list.filter((s) => String(s.data.primary_platform ?? '').toLowerCase() === spec.filterValue);
+    } else if (spec.filterKind === 'platform-regex') {
+      const re = new RegExp(spec.filterValue, 'i');
+      list = list.filter((s) => re.test(String(s.data.primary_platform ?? '')));
+    } else if (spec.filterKind === 'tag') {
+      list = list.filter((s) => (s.data.tags ?? []).some((t) => t.toLowerCase() === spec.filterValue));
+    } else if (spec.filterKind === 'nationality') {
+      list = list.filter((s) => String(s.data.nationality ?? '').toLowerCase().includes(spec.filterValue));
+    }
+    list = [...list].sort((a, b) => (b.data.followers ?? 0) - (a.data.followers ?? 0)).slice(0, spec.limit);
+    return {
+      params: { slug: spec.slug },
+      props: { spec, list: list.map((s) => ({ id: s.id, data: s.data })) },
+    };
+  });
+}
+
+const { spec, list } = Astro.props;
+
+function fmt(n) {
+  if (!n) return '-';
+  if (n >= 1000000) { const v = (n / 1000000).toFixed(n >= 10000000 ? 0 : 1); return (v.endsWith('.0') ? v.slice(0, -2) : v) + 'M'; }
+  if (n >= 1000) { const v = (n / 1000).toFixed(n >= 10000 ? 0 : 1); return (v.endsWith('.0') ? v.slice(0, -2) : v) + 'K'; }
+  return String(n);
+}
+---
+<BaseLayout title={spec.title} seoTitle={spec.seoTitle} description={spec.description}>
+  <section class="hero" style="padding:3rem 0 1.8rem;">
+    <div class="container">
+      <p class="muted small"><a href="/">Home</a> / <a href="/top/">Top lists</a> / <strong>{spec.h1}</strong></p>
+      <h1>{spec.h1}</h1>
+      <p>{spec.description}</p>
+    </div>
+  </section>
+
+  <div class="container" style="padding:2rem 0;">
+    <ol class="rank-list">
+      {list.map((s, i) => (
+        <li class="rank-row">
+          <span class="rank-n">{i + 1}</span>
+          <a href={entryUrl('streamers', s.id)} class="rank-link">
+            <span class="rank-name">{s.data.name}</span>
+            {s.data.primary_platform && <span class="rank-platform">{s.data.primary_platform}</span>}
+          </a>
+          <span class="rank-followers">{fmt(s.data.followers)}</span>
+        </li>
+      ))}
+    </ol>
+  </div>
+</BaseLayout>
+
+<style>
+  .rank-list { list-style: none; margin: 0; padding: 0; }
+  .rank-row {
+    display: grid;
+    grid-template-columns: 40px 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-top: 1px solid var(--border-soft);
+  }
+  .rank-row:first-child { border-top: 0; }
+  .rank-n { font-family: var(--mono); font-size: 0.9rem; color: var(--text-faint); text-align: right; }
+  .rank-link { display: flex; flex-direction: column; gap: 0.1rem; color: var(--text); border: 0; }
+  .rank-name { font-family: var(--display); font-weight: 700; font-size: 1.05rem; letter-spacing: -0.015em; }
+  .rank-link:hover .rank-name { color: var(--accent); }
+  .rank-platform { font-family: var(--mono); font-size: 0.75rem; color: var(--text-faint); }
+  .rank-followers {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.15rem;
+    color: var(--accent);
+    letter-spacing: -0.025em;
+  }
+</style>

@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { loadAllEntries } from '../../lib/links';
+
+const all = await loadAllEntries();
+const bucket = new Map<string, { tag: string; count: number }>();
+const push = (arr: any[]) => {
+  for (const e of arr) for (const t of e.data.tags ?? []) {
+    const k = String(t).toLowerCase();
+    if (!bucket.has(k)) bucket.set(k, { tag: t, count: 0 });
+    bucket.get(k)!.count++;
+  }
+};
+push(all.streamers); push(all.platforms); push(all.concepts); push(all.events); push(all.orgs);
+
+const list = [...bucket.entries()]
+  .filter(([, v]) => v.count >= 2)
+  .sort((a, b) => b[1].count - a[1].count);
+
+const title = 'Browse by tag';
+const description = 'Every tag on Streamers.wiki — variety, FPS, VTuber, Spanish, subathon, IRL and more.';
+---
+<BaseLayout title={title} description={description} seoTitle="Tags — Streamers.wiki Browse Index">
+  <section class="hero" style="padding:3rem 0 1.8rem;">
+    <div class="container">
+      <h1>Browse by tag</h1>
+      <p>Every tag used across the wiki, in descending order of entries.</p>
+    </div>
+  </section>
+
+  <div class="container" style="padding:2rem 0;">
+    <div class="tag-cloud">
+      {list.map(([slug, v]) => (
+        <a href={`/tag/${encodeURIComponent(slug)}/`} class="pill" style={`font-size:${0.78 + Math.min(v.count, 20) * 0.02}rem;`}>
+          {v.tag} <span class="muted small">{v.count}</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</BaseLayout>

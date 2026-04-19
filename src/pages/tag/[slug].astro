@@ -1,0 +1,102 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntityCard from '../../components/EntityCard.astro';
+import { loadAllEntries, type EntityType } from '../../lib/links';
+
+export async function getStaticPaths() {
+  const all = await (await import('../../lib/links')).loadAllEntries();
+  const bucket = new Map<string, { tag: string; entries: any[] }>();
+  const push = (type: EntityType, arr: any[]) => {
+    for (const e of arr) {
+      for (const t of e.data.tags ?? []) {
+        const key = String(t).toLowerCase();
+        if (!bucket.has(key)) bucket.set(key, { tag: t, entries: [] });
+        bucket.get(key)!.entries.push({ type, entry: e });
+      }
+    }
+  };
+  push('streamers', all.streamers);
+  push('platforms', all.platforms);
+  push('concepts', all.concepts);
+  push('events', all.events);
+  push('orgs', all.orgs);
+  return [...bucket.entries()]
+    .filter(([, v]) => v.entries.length >= 2)
+    .map(([slug, v]) => ({
+      params: { slug },
+      props: { slug, tag: v.tag, items: v.entries },
+    }));
+}
+
+const { slug, tag, items } = Astro.props as any;
+const site = 'https://streamers.wiki';
+const byType: Record<string, any[]> = {};
+for (const it of items) {
+  (byType[it.type] ||= []).push(it.entry);
+}
+const typeLabel: Record<string, string> = {
+  streamers: 'Streamers',
+  platforms: 'Platforms',
+  concepts: 'Concepts',
+  events: 'Events',
+  orgs: 'Organizations',
+};
+
+const displayTag = tag.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+const title = `${displayTag} streamers & creators`;
+const description = `${items.length} entries on Streamers.wiki tagged "${tag}" — ${Object.keys(byType).map((k) => `${byType[k].length} ${typeLabel[k].toLowerCase()}`).join(', ')}.`;
+const seoTitle = `${displayTag} — Top Streamers, Creators & ${tag === 'variety' ? 'Personalities' : 'Events'} | Streamers.wiki`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: title,
+  description,
+  url: `${site}/tag/${slug}/`,
+  breadcrumb: {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: site + '/' },
+      { '@type': 'ListItem', position: 2, name: 'Tags', item: site + '/tag/' },
+      { '@type': 'ListItem', position: 3, name: displayTag, item: `${site}/tag/${slug}/` },
+    ],
+  },
+};
+---
+<BaseLayout title={title} description={description} seoTitle={seoTitle} jsonLd={jsonLd}>
+  <section class="hero" style="padding:3rem 0 1.8rem;">
+    <div class="container">
+      <nav class="breadcrumbs" aria-label="Breadcrumb" style="margin-bottom:1rem;">
+        <ol style="list-style:none;padding:0;margin:0;display:flex;gap:0.4rem;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.78rem;color:var(--text-faint);">
+          <li><a href="/" style="color:var(--text-dim);border:0;">Home</a></li>
+          <li style="opacity:0.5;">/</li>
+          <li><a href="/tag/" style="color:var(--text-dim);border:0;">Tags</a></li>
+          <li style="opacity:0.5;">/</li>
+          <li style="color:var(--text);"><strong>{displayTag}</strong></li>
+        </ol>
+      </nav>
+      <h1>#{tag}</h1>
+      <p>{items.length} entries on Streamers.wiki tagged <code>{tag}</code>.</p>
+    </div>
+  </section>
+
+  <div class="container" style="padding:2rem 0;">
+    {Object.entries(byType).map(([type, arr]) => (
+      <section style="margin-bottom:2.5rem;">
+        <h2 style="text-transform:capitalize;">{typeLabel[type]} ({arr.length})</h2>
+        <div class="grid">
+          {arr.map((e: any) => (
+            <EntityCard
+              type={type as EntityType}
+              slug={e.id}
+              name={e.data.name}
+              description={e.data.description}
+              tags={e.data.tags?.filter((t: string) => t !== tag).slice(0, 3)}
+              meta={e.data.primary_platform || e.data.founded || e.data.date || e.data.category}
+            />
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+</BaseLayout>

@@ -11,14 +11,15 @@ export interface Props {
   jsonLd?: Record<string, any> | Record<string, any>[];
   noMdTwin?: boolean;
   ogImage?: string;
+  seoTitle?: string;
 }
 
-const { title, description, path, jsonLd, noMdTwin, ogImage } = Astro.props as Props;
+const { title, description, path, jsonLd, noMdTwin, ogImage, seoTitle } = Astro.props as Props;
 const site = 'https://streamers.wiki';
 const url = new URL(Astro.url.pathname, site).toString();
 const pathHasEntity = /^\/(streamer|platform|concept|event|org)\//.test(Astro.url.pathname);
 const mdUrl = (!noMdTwin && pathHasEntity) ? url.replace(/\/$/, '') + '.md' : null;
-const pageTitle = title === 'Streamers.wiki' ? title : `${title} — Streamers.wiki`;
+const pageTitle = seoTitle ? seoTitle : (title === 'Streamers.wiki' ? title : `${title} — Streamers.wiki`);
 
 const entityPathMatch = Astro.url.pathname.match(/^\/(streamer|platform|concept|event|org)\/([^/]+)\/?$/);
 const typeMap: Record<string, string> = { streamer: 'streamers', platform: 'platforms', concept: 'concepts', event: 'events', org: 'orgs' };

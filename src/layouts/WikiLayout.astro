@@ -2,7 +2,9 @@
 import BaseLayout from './BaseLayout.astro';
 import Backlinks from '../components/Backlinks.astro';
 import Infobox from '../components/Infobox.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import type { EntityType } from '../lib/links';
+import { entryUrl } from '../lib/links';
 import { relativeTime } from '../lib/time';
 
 export interface Props {
@@ -18,9 +20,10 @@ export interface Props {
   headings?: { depth: number; slug: string; text: string }[];
   hideDefaultHeader?: boolean;
   themeStyle?: string;
+  seoTitle?: string;
 }
 
-const { type, slug, title, description, updated, tags = [], sources = [], infobox = [], jsonLd, headings = [], hideDefaultHeader = false, themeStyle } = Astro.props as Props;
+const { type, slug, title, description, updated, tags = [], sources = [], infobox = [], jsonLd, headings = [], hideDefaultHeader = false, themeStyle, seoTitle } = Astro.props as Props;
 
 const typeLabel: Record<EntityType, string> = {
   streamers: 'Streamer',
@@ -37,7 +40,7 @@ const pillClass: Record<EntityType, string> = {
   orgs: 'pill-org',
 };
 ---
-<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+<BaseLayout title={title} description={description} jsonLd={jsonLd} seoTitle={seoTitle}>
   <div class="container" style={`padding-top:2rem; ${themeStyle ?? ''}`}>
     <div class="wiki-grid">
       <aside class="side">
@@ -56,11 +59,12 @@ const pillClass: Record<EntityType, string> = {
       </aside>
 
       <article class="prose">
+        <Breadcrumbs type={type} name={title} url={entryUrl(type, slug)} />
         {!hideDefaultHeader && (
           <>
             <div class="row" style="margin-bottom:0.3rem;">
               <span class={`pill ${pillClass[type]}`}>{typeLabel[type]}</span>
-              {tags.slice(0, 6).map((t) => <span class="pill">{t}</span>)}
+              {tags.slice(0, 6).map((t) => <a class="pill" href={`/tag/${encodeURIComponent(t)}/`}>{t}</a>)}
             </div>
             <h1>{title}</h1>
             <p class="muted" style="font-size:1.1rem;margin-top:-0.3rem;">{description}</p>

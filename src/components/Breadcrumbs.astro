@@ -1,0 +1,92 @@
+---
+import type { EntityType } from '../lib/links';
+import { ENTITY_ROUTES } from '../lib/links';
+
+interface Props {
+  type: EntityType;
+  name: string;
+  url: string;
+}
+const { type, name, url } = Astro.props as Props;
+
+const typeLabel: Record<EntityType, string> = {
+  streamers: 'Streamers',
+  platforms: 'Platforms',
+  concepts: 'Concepts',
+  events: 'Events',
+  orgs: 'Organizations',
+};
+const typeLandingRoute: Record<EntityType, string> = {
+  streamers: '/browse/',
+  platforms: '/platforms/',
+  concepts: '/concepts/',
+  events: '/events/',
+  orgs: '/orgs/',
+};
+
+const site = 'https://streamers.wiki';
+const trail = [
+  { name: 'Home', url: site + '/' },
+  { name: typeLabel[type], url: site + typeLandingRoute[type] },
+  { name, url: site + url },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: trail.map((t, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: t.name,
+    item: t.url,
+  })),
+};
+---
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <ol>
+    {trail.map((t, i) => (
+      <li>
+        {i < trail.length - 1 ? (
+          <>
+            <a href={new URL(t.url).pathname}>{t.name}</a>
+            <span class="sep" aria-hidden="true">/</span>
+          </>
+        ) : (
+          <span aria-current="page">{t.name}</span>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+<style>
+  .breadcrumbs {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--text-faint);
+    margin: 0 0 1rem;
+    letter-spacing: 0.02em;
+  }
+  .breadcrumbs ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .breadcrumbs li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .breadcrumbs a {
+    color: var(--text-dim);
+    border: 0;
+  }
+  .breadcrumbs a:hover { color: var(--accent); }
+  .breadcrumbs .sep { color: var(--text-faint); opacity: 0.5; }
+  .breadcrumbs [aria-current="page"] { color: var(--text); font-weight: 700; }
+</style>

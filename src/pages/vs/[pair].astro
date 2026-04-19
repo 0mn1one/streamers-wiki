@@ -1,0 +1,166 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { entryUrl } from '../../lib/links';
+import { platformTheme } from '../../lib/platform-theme';
+
+export async function getStaticPaths() {
+  const all = await getCollection('streamers');
+  const sorted = [...all].sort((x, y) => (y.data.followers ?? 0) - (x.data.followers ?? 0));
+  const top = sorted.slice(0, 20);
+  const paths = [];
+  for (let i = 0; i < top.length; i++) {
+    for (let j = i + 1; j < top.length; j++) {
+      paths.push({
+        params: { pair: `${top[i].id}-vs-${top[j].id}` },
+        props: {
+          a: { id: top[i].id, data: top[i].data },
+          b: { id: top[j].id, data: top[j].data },
+        },
+      });
+    }
+  }
+  return paths;
+}
+
+const { a, b } = Astro.props;
+const ta = platformTheme(a.data.primary_platform);
+const tb = platformTheme(b.data.primary_platform);
+
+function fmt(n) {
+  if (!n) return '—';
+  if (n >= 1000000) { const v = (n / 1000000).toFixed(n >= 10000000 ? 0 : 1); return (v.endsWith('.0') ? v.slice(0, -2) : v) + 'M'; }
+  if (n >= 1000) { const v = (n / 1000).toFixed(n >= 10000 ? 0 : 1); return (v.endsWith('.0') ? v.slice(0, -2) : v) + 'K'; }
+  return String(n);
+}
+
+const rows = [
+  { label: 'Followers', a: fmt(a.data.followers), b: fmt(b.data.followers), win: (a.data.followers ?? 0) >= (b.data.followers ?? 0) ? 'a' : 'b' },
+  { label: 'Peak subs', a: fmt(a.data.subs_peak), b: fmt(b.data.subs_peak), win: (a.data.subs_peak ?? 0) >= (b.data.subs_peak ?? 0) ? 'a' : 'b' },
+  { label: 'Primary platform', a: a.data.primary_platform ?? '—', b: b.data.primary_platform ?? '—', win: null },
+  { label: 'Started', a: a.data.started ?? '—', b: b.data.started ?? '—', win: null },
+  { label: 'Nationality', a: a.data.nationality ?? '—', b: b.data.nationality ?? '—', win: null },
+  { label: 'Real name', a: a.data.real_name ?? '—', b: b.data.real_name ?? '—', win: null },
+  { label: 'Active', a: a.data.active ? 'Yes' : 'No', b: b.data.active ? 'Yes' : 'No', win: null },
+  { label: 'Genres', a: (a.data.genres ?? []).join(', ') || '—', b: (b.data.genres ?? []).join(', ') || '—', win: null },
+];
+
+const pageTitle = `${a.data.name} vs ${b.data.name}`;
+const seoTitle = `${a.data.name} vs ${b.data.name} — Followers, Platforms, Stats Compared | Streamers.wiki`;
+const description = `Side-by-side comparison of ${a.data.name} and ${b.data.name}: followers, platforms, stats, history and more.`;
+const site = 'https://streamers.wiki';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: pageTitle,
+  description,
+  url: `${site}/vs/${Astro.params.pair}/`,
+  mainEntity: [
+    { '@type': 'Person', name: a.data.name, url: site + entryUrl('streamers', a.id) },
+    { '@type': 'Person', name: b.data.name, url: site + entryUrl('streamers', b.id) },
+  ],
+};
+---
+<BaseLayout title={pageTitle} seoTitle={seoTitle} description={description} jsonLd={jsonLd}>
+  <section class="vs-hero">
+    <div class="container">
+      <div class="vs-names">
+        <a href={entryUrl('streamers', a.id)} class="vs-name" style={`color:${ta.accent};`}>{a.data.name}</a>
+        <span class="vs-x">vs</span>
+        <a href={entryUrl('streamers', b.id)} class="vs-name" style={`color:${tb.accent};`}>{b.data.name}</a>
+      </div>
+      <p class="muted" style="text-align:center;">Side-by-side comparison — followers, platforms, stats and history.</p>
+    </div>
+  </section>
+
+  <div class="container" style="padding:1.5rem 0 3rem;">
+    <table class="vs-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th style={`color:${ta.accent};`}>{a.data.name}</th>
+          <th style={`color:${tb.accent};`}>{b.data.name}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row) => (
+          <tr>
+            <th>{row.label}</th>
+            <td class={row.win === 'a' ? 'vs-win' : ''}>{row.a}</td>
+            <td class={row.win === 'b' ? 'vs-win' : ''}>{row.b}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+
+    <section style="margin-top:2rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+      <article class="vs-side">
+        <h2 style={`color:${ta.accent};`}>{a.data.name}</h2>
+        <p>{a.data.description}</p>
+        <p><a href={entryUrl('streamers', a.id)}>→ Full profile</a></p>
+      </article>
+      <article class="vs-side">
+        <h2 style={`color:${tb.accent};`}>{b.data.name}</h2>
+        <p>{b.data.description}</p>
+        <p><a href={entryUrl('streamers', b.id)}>→ Full profile</a></p>
+      </article>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .vs-hero {
+    padding: 3.5rem 0 1.5rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border-soft);
+    background: radial-gradient(ellipse 80% 50% at 50% 0%, color-mix(in oklab, var(--accent) 16%, transparent), transparent 70%);
+  }
+  .vs-names { display: flex; justify-content: center; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+  .vs-name {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(2rem, 5.5vw, 3.5rem);
+    letter-spacing: -0.04em;
+    line-height: 1;
+    border: 0;
+  }
+  .vs-name:hover { filter: brightness(1.15); }
+  .vs-x {
+    font-family: var(--mono);
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  .vs-table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+  .vs-table th {
+    text-align: left;
+    padding: 0.7rem 0.85rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-faint);
+    font-weight: 600;
+    background: transparent;
+  }
+  .vs-table thead th {
+    font-family: var(--display);
+    font-size: 0.95rem;
+    text-transform: none;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+  .vs-table td { padding: 0.7rem 0.85rem; border-bottom: 1px solid var(--border-soft); font-size: 0.95rem; }
+  .vs-table tbody th { border-bottom: 1px solid var(--border-soft); }
+  .vs-win { color: var(--accent-pale); font-weight: 700; }
+  .vs-side {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.2rem;
+  }
+  .vs-side h2 { margin-top: 0; font-size: 1.2rem; border: 0; padding: 0; }
+</style>
