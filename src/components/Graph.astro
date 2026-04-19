@@ -12,19 +12,29 @@ const payload = JSON.stringify({ ...graph, focusId, colors });
 ---
 <div class="graph-wrap" style={`height:${height};`}>
   <div id="graph"></div>
-  <div class="graph-legend">
-    <div><span class="dot" style="background:#8b5cf6"></span>Streamer</div>
-    <div><span class="dot" style="background:#22d3ee"></span>Platform</div>
-    <div><span class="dot" style="background:#f59e0b"></span>Concept</div>
-    <div><span class="dot" style="background:#ef4444"></span>Event</div>
-    <div><span class="dot" style="background:#10b981"></span>Organization</div>
+
+  <div class="graph-legend" id="graph-legend" aria-label="Entity type filters">
+    <button class="leg-row active" data-type="streamers"><span class="dot" style="background:#7c5cff"></span><span>Streamer</span></button>
+    <button class="leg-row active" data-type="platforms"><span class="dot" style="background:#00c2ff"></span><span>Platform</span></button>
+    <button class="leg-row active" data-type="concepts"><span class="dot" style="background:#ffb020"></span><span>Concept</span></button>
+    <button class="leg-row active" data-type="events"><span class="dot" style="background:#ff4a4a"></span><span>Event</span></button>
+    <button class="leg-row active" data-type="orgs"><span class="dot" style="background:#21d07a"></span><span>Organization</span></button>
   </div>
+
+  <div class="graph-search">
+    <input id="graph-search-input" type="search" placeholder="Find a node…" autocomplete="off" spellcheck="false" />
+  </div>
+
   <div class="graph-controls">
-    <button id="graph-fit" title="Fit to screen">Fit</button>
-    <button id="graph-replay" title="Re-run layout">Replay</button>
+    <button id="graph-fit" title="Fit to screen">⤢</button>
+    <button id="graph-replay" title="Re-run layout">↻</button>
+    <button id="graph-drift" title="Toggle drift" aria-pressed="true">∿</button>
   </div>
+
   <div class="graph-tooltip" id="graph-tooltip"></div>
+  <div class="graph-status" id="graph-status" aria-live="polite"></div>
 </div>
+
 <script type="application/json" id="graph-data" set:html={payload}></script>
 <script>
   import cytoscape from 'cytoscape';
@@ -32,18 +42,31 @@ const payload = JSON.stringify({ ...graph, focusId, colors });
   import coseBilkent from 'cytoscape-cose-bilkent';
   cytoscape.use(coseBilkent);
 
-  const { nodes, edges, focusId, colors } = JSON.parse(document.getElementById('graph-data')!.textContent!);
+  const { nodes, edges, focusId, colors } = JSON.parse(
+    document.getElementById('graph-data')!.textContent!
+  );
   const container = document.getElementById('graph')!;
   const tooltip = document.getElementById('graph-tooltip')!;
+  const statusEl = document.getElementById('graph-status')!;
 
   const cy = cytoscape({
     container,
     elements: [
       ...nodes.map((n: any) => ({
-        data: { id: n.id, label: n.name, type: n.type, url: n.url, description: n.description, degree: n.degree ?? 0 },
+        data: {
+          id: n.id,
+          label: n.name,
+          type: n.type,
+          url: n.url,
+          description: n.description,
+          degree: n.degree ?? 0,
+          tags: n.tags ?? [],
+        },
+        classes: 'entering',
       })),
       ...edges.map((e: any, i: number) => ({
         data: { id: `e${i}`, source: e.source, target: e.target, kind: e.kind },
+        classes: 'edge-entering',
       })),
     ],
     style: [
@@ -51,100 +74,398 @@ const payload = JSON.stringify({ ...graph, focusId, colors });
         selector: 'node',
         style: {
           'background-color': (ele: any) => colors[ele.data('type')] ?? '#888',
+          'background-opacity': 0.95,
           'label': 'data(label)',
-          'color': '#e6e8eb',
+          'color': '#efeff1',
           'font-size': 10,
+          'font-weight': 600,
           'font-family': 'Inter, system-ui, sans-serif',
           'text-valign': 'bottom',
-          'text-margin-y': 6,
-          'text-outline-width': 2,
-          'text-outline-color': '#0b0d10',
-          'width': (ele: any) => 10 + Math.min(24, (ele.data('degree') ?? 0) * 2),
-          'height': (ele: any) => 10 + Math.min(24, (ele.data('degree') ?? 0) * 2),
+          'text-margin-y': 8,
+          'text-outline-width': 3,
+          'text-outline-color': '#0e0d15',
+          'text-outline-opacity': 0.95,
+          'width': (ele: any) => 10 + Math.min(22, (ele.data('degree') ?? 0) * 1.8),
+          'height': (ele: any) => 10 + Math.min(22, (ele.data('degree') ?? 0) * 1.8),
           'border-width': 0,
-          'transition-property': 'background-color, width, height, border-width',
-          'transition-duration': 180,
-        },
+          'border-color': '#fff',
+          'border-opacity': 0,
+          'transition-property': 'background-opacity, border-width, border-opacity, width, height, text-opacity',
+          'transition-duration': 220,
+          'transition-timing-function': 'ease-out',
+        } as any,
       },
       {
-        selector: 'node:hover',
-        style: { 'border-width': 2, 'border-color': '#fff' },
+        selector: 'node.entering',
+        style: { 'background-opacity': 0, 'text-opacity': 0 } as any,
+      },
+      {
+        selector: 'node:active, node:grabbed',
+        style: { 'border-width': 3, 'border-opacity': 1, 'overlay-opacity': 0 } as any,
+      },
+      {
+        selector: 'node.highlight',
+        style: {
+          'border-width': 3,
+          'border-opacity': 1,
+          'border-color': '#fff',
+          'z-index': 10,
+        } as any,
       },
       {
         selector: 'node.focus',
-        style: { 'border-width': 3, 'border-color': '#a78bfa' },
+        style: {
+          'border-width': 4,
+          'border-opacity': 1,
+          'border-color': '#c4b4ff',
+          'z-index': 12,
+        } as any,
       },
       {
         selector: 'node.faded',
-        style: { 'opacity': 0.15 },
+        style: { 'background-opacity': 0.1, 'text-opacity': 0.15 } as any,
+      },
+      {
+        selector: 'node.hide',
+        style: {
+          'display': 'none',
+        } as any,
       },
       {
         selector: 'edge',
         style: {
           'width': 1,
-          'line-color': '#2b313b',
+          'line-color': '#2a2837',
           'curve-style': 'bezier',
-          'opacity': 0.7,
-        },
+          'opacity': 0.6,
+          'transition-property': 'line-color, opacity, width',
+          'transition-duration': 220,
+          'transition-timing-function': 'ease-out',
+        } as any,
+      },
+      {
+        selector: 'edge.edge-entering',
+        style: { 'opacity': 0 } as any,
       },
       {
         selector: 'edge.highlight',
-        style: { 'line-color': '#a78bfa', 'opacity': 1, 'width': 2 },
+        style: { 'line-color': '#7c5cff', 'opacity': 1, 'width': 2.5 } as any,
       },
       {
         selector: 'edge.faded',
-        style: { 'opacity': 0.08 },
+        style: { 'opacity': 0.05 } as any,
+      },
+      {
+        selector: 'edge.hide',
+        style: { 'display': 'none' } as any,
       },
     ],
     layout: {
       name: 'cose-bilkent',
       animate: 'end',
-      animationDuration: 600,
-      idealEdgeLength: 80,
+      animationDuration: 700,
+      idealEdgeLength: 85,
       nodeRepulsion: 5500,
-      edgeElasticity: 0.4,
-      gravity: 0.25,
+      edgeElasticity: 0.42,
+      gravity: 0.28,
       numIter: 2500,
       tile: true,
       randomize: true,
     } as any,
-    wheelSensitivity: 0.2,
-    minZoom: 0.2,
-    maxZoom: 3,
+    wheelSensitivity: 0.22,
+    minZoom: 0.15,
+    maxZoom: 3.5,
   });
 
+  // --- Entrance animation: stagger nodes in, then fade edges ---
+  cy.ready(() => {
+    const n = cy.nodes();
+    n.forEach((el, i) => {
+      setTimeout(() => {
+        el.removeClass('entering');
+      }, Math.min(i * 8, 600) + 200);
+    });
+    cy.edges().forEach((el, i) => {
+      setTimeout(() => {
+        el.removeClass('edge-entering');
+      }, 650 + Math.min(i * 2, 400));
+    });
+  });
+
+  // --- Continuous gentle drift (breathe) ---
+  let driftOn = true;
+  const rng = (n = 1) => (Math.random() - 0.5) * n;
+  function driftTick() {
+    if (!driftOn) return;
+    cy.batch(() => {
+      cy.nodes().forEach((node) => {
+        if (node.grabbed()) return;
+        if (node.hasClass('hide')) return;
+        const p = node.position();
+        // tiny random nudge + slight restoring pull based on degree (heavier nodes move less)
+        const d = node.data('degree') ?? 0;
+        const amp = Math.max(0.25, 1.1 - d * 0.04);
+        node.position({
+          x: p.x + rng(amp),
+          y: p.y + rng(amp),
+        });
+      });
+    });
+  }
+  const driftInterval = setInterval(driftTick, 70);
+
+  // --- Hover: highlight neighborhood + strong emphasis ---
   cy.on('mouseover', 'node', (evt) => {
     const node = evt.target;
-    const pos = evt.renderedPosition || node.renderedPosition();
-    tooltip.innerHTML = `<strong>${node.data('label')}</strong><div class="muted small">${node.data('description') || ''}</div>`;
+    const renderedPos = node.renderedPosition();
+    tooltip.innerHTML = `<strong>${node.data('label')}</strong><div class="muted small">${node.data('description') ?? ''}</div>`;
     tooltip.style.display = 'block';
-    tooltip.style.left = pos.x + 14 + 'px';
-    tooltip.style.top = pos.y + 14 + 'px';
+    tooltip.style.left = renderedPos.x + 16 + 'px';
+    tooltip.style.top = renderedPos.y + 16 + 'px';
 
-    const neighborhood = node.closedNeighborhood();
-    cy.elements().addClass('faded');
-    neighborhood.removeClass('faded');
-    neighborhood.connectedEdges().addClass('highlight');
+    const hood = node.closedNeighborhood();
+    cy.elements().not(hood).addClass('faded');
+    hood.addClass('highlight');
+    hood.connectedEdges().addClass('highlight');
+    node.addClass('highlight');
   });
   cy.on('mouseout', 'node', () => {
     tooltip.style.display = 'none';
     cy.elements().removeClass('faded highlight');
   });
+
   cy.on('tap', 'node', (evt) => {
     const url = evt.target.data('url');
     if (url) window.location.href = url;
   });
 
+  // --- Controls ---
   document.getElementById('graph-fit')!.addEventListener('click', () => cy.fit(undefined, 40));
-  document.getElementById('graph-replay')!.addEventListener('click', () => cy.layout({ name: 'cose-bilkent', animate: 'end', animationDuration: 600 } as any).run());
+  document.getElementById('graph-replay')!.addEventListener('click', () => {
+    cy.layout({ name: 'cose-bilkent', animate: 'end', animationDuration: 700 } as any).run();
+  });
+  const driftBtn = document.getElementById('graph-drift')!;
+  driftBtn.addEventListener('click', () => {
+    driftOn = !driftOn;
+    driftBtn.setAttribute('aria-pressed', String(driftOn));
+    driftBtn.style.opacity = driftOn ? '1' : '0.5';
+  });
 
+  // --- Legend type filters ---
+  const legend = document.getElementById('graph-legend')!;
+  const hiddenTypes = new Set<string>();
+  legend.querySelectorAll<HTMLButtonElement>('.leg-row').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const t = btn.dataset.type!;
+      if (hiddenTypes.has(t)) {
+        hiddenTypes.delete(t);
+        btn.classList.add('active');
+      } else {
+        hiddenTypes.add(t);
+        btn.classList.remove('active');
+      }
+      cy.batch(() => {
+        cy.nodes().forEach((n) => {
+          if (hiddenTypes.has(n.data('type'))) n.addClass('hide');
+          else n.removeClass('hide');
+        });
+        cy.edges().forEach((e) => {
+          const s = e.source(), t = e.target();
+          if (s.hasClass('hide') || t.hasClass('hide')) e.addClass('hide');
+          else e.removeClass('hide');
+        });
+      });
+      updateStatus();
+    });
+  });
+
+  // --- Search ---
+  const searchInput = document.getElementById('graph-search-input') as HTMLInputElement;
+  let searchTimer: any = null;
+  searchInput.addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(runSearch, 120);
+  });
+  function runSearch() {
+    const q = searchInput.value.trim().toLowerCase();
+    cy.elements().removeClass('highlight faded');
+    if (!q) {
+      statusEl.textContent = '';
+      return;
+    }
+    const matches = cy.nodes().filter((n) => {
+      const label = String(n.data('label') ?? '').toLowerCase();
+      const tags = (n.data('tags') ?? []).join(' ').toLowerCase();
+      return label.includes(q) || tags.includes(q);
+    });
+    cy.elements().addClass('faded');
+    matches.removeClass('faded').addClass('highlight');
+    matches.closedNeighborhood().removeClass('faded');
+    matches.connectedEdges().removeClass('faded').addClass('highlight');
+    statusEl.textContent = `${matches.length} match${matches.length === 1 ? '' : 'es'}`;
+    if (matches.length > 0) {
+      cy.animate({ fit: { eles: matches, padding: 80 }, duration: 500 });
+    }
+  }
+
+  function updateStatus() {
+    const visible = cy.nodes().filter((n) => !n.hasClass('hide')).length;
+    statusEl.textContent = `${visible} nodes`;
+  }
+  updateStatus();
+
+  // --- Focus target node on load ---
   if (focusId) {
     const target = cy.getElementById(focusId);
     if (target.length) {
       target.addClass('focus');
       setTimeout(() => {
-        cy.animate({ center: { eles: target }, zoom: 1.4, duration: 600 });
-      }, 700);
+        cy.animate({ center: { eles: target }, zoom: 1.4, duration: 700 });
+      }, 800);
     }
   }
+
+  // Cleanup on navigation
+  window.addEventListener('beforeunload', () => {
+    clearInterval(driftInterval);
+  });
 </script>
+
+<style is:global>
+  /* Playful legend as toggles */
+  .graph-legend {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    z-index: 5;
+  }
+  .graph-legend .leg-row {
+    display: inline-flex;
+    gap: 0.55rem;
+    align-items: center;
+    padding: 0.3rem 0.7rem;
+    background: color-mix(in oklab, var(--bg) 80%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    cursor: pointer;
+    transition: all 180ms ease;
+  }
+  .graph-legend .leg-row:hover { color: var(--text); border-color: var(--accent); transform: translateX(1px); }
+  .graph-legend .leg-row:not(.active) { opacity: 0.38; text-decoration: line-through; }
+  .graph-legend .leg-row .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    box-shadow: 0 0 8px currentColor;
+    flex-shrink: 0;
+  }
+
+  .graph-search {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+  }
+  .graph-search input {
+    width: 220px;
+    padding: 0.4rem 0.85rem;
+    background: color-mix(in oklab, var(--bg) 80%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text);
+    font-size: 0.85rem;
+    font-family: var(--mono);
+    outline: none;
+    transition: all 180ms ease;
+  }
+  .graph-search input:focus {
+    width: 280px;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 25%, transparent);
+  }
+  .graph-search input::placeholder { color: var(--text-faint); }
+
+  .graph-controls {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    gap: 0.35rem;
+    z-index: 5;
+  }
+  .graph-controls button {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in oklab, var(--bg) 80%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 50%;
+    cursor: pointer;
+    font-family: var(--sans);
+    font-size: 1rem;
+    transition: all 180ms ease;
+  }
+  .graph-controls button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: scale(1.08);
+  }
+  .graph-controls button[aria-pressed="false"] { opacity: 0.5; }
+
+  .graph-status {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    z-index: 5;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-faint);
+    padding: 0.3rem 0.55rem;
+    background: color-mix(in oklab, var(--bg) 80%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+    pointer-events: none;
+  }
+  .graph-status:empty { display: none; }
+
+  .graph-tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 0.55rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    max-width: 260px;
+    color: var(--text);
+    display: none;
+    z-index: 6;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+  }
+  .graph-tooltip strong {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 0.95rem;
+    display: block;
+    margin-bottom: 0.15rem;
+  }
+</style>
