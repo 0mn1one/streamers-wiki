@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+function slugify(s: string) {
+  return s.toLowerCase().replace(/[-()]/g, ' ').replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '-').replace(/^-|-$/g, '');
+}
+
+const streamers = await getCollection('streamers');
+const bucket = new Map<string, { name: string; count: number }>();
+for (const s of streamers) {
+  const nat = s.data.nationality;
+  if (!nat) continue;
+  const parts = nat.split(/[-,]/).map((p) => p.trim()).filter(Boolean);
+  if (!parts.length || parts[0].toLowerCase() === 'unknown') continue;
+  const key = slugify(parts[0]);
+  const name = parts[0];
+  if (!bucket.has(key)) bucket.set(key, { name, count: 0 });
+  bucket.get(key)!.count++;
+}
+
+const list = [...bucket.entries()]
+  .filter(([, v]) => v.count >= 2)
+  .sort((a, b) => b[1].count - a[1].count);
+---
+<BaseLayout title="Browse by country" description="Streamers on Streamers.wiki grouped by country of origin.">
+  <section class="hero" style="padding:3rem 0 1.8rem;">
+    <div class="container">
+      <h1>Browse by country</h1>
+      <p>Streamers grouped by country of origin. Spanish-language, Brazilian, UK, Japanese and Korean creator scenes each form their own distinct culture.</p>
+    </div>
+  </section>
+
+  <div class="container" style="padding:2rem 0;">
+    <div class="grid">
+      {list.map(([slug, v]) => (
+        <a class="card" href={`/country/${slug}/`} style="color:var(--text);">
+          <div class="row" style="align-items:baseline;justify-content:space-between;">
+            <h3 style="margin:0;font-family:var(--display);font-size:1.1rem;">{v.name}</h3>
+            <span class="mono small muted">{v.count} streamers</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</BaseLayout>

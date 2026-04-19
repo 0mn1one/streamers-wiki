@@ -9,12 +9,15 @@ const ac = (p: string) => (isActive(p) ? 'page' : undefined);
       streamers<span class="brand-dot" aria-hidden="true"></span>wiki
     </a>
     <div class="nav-links">
+      <a href="/trending/" aria-current={ac('/trending')} class="nav-trending">
+        <span class="nav-dot" aria-hidden="true"></span>Trending
+      </a>
       <a href="/browse/" aria-current={ac('/browse')}>Browse</a>
       <a href="/graph/" aria-current={ac('/graph')}>Graph</a>
+      <a href="/records/" aria-current={ac('/records')}>Records</a>
       <a href="/platforms/" aria-current={ac('/platforms')}>Platforms</a>
       <a href="/concepts/" aria-current={ac('/concepts')}>Concepts</a>
       <a href="/events/" aria-current={ac('/events')}>Events</a>
-      <a href="/about/" aria-current={ac('/about')}>About</a>
     </div>
     <button class="search-trigger" id="search-trigger" aria-label="Open search">
       Search

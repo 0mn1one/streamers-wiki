@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntityCard from '../../components/EntityCard.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const slugify = (s: string) => s.toLowerCase().replace(/[-()]/g, ' ').replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '-').replace(/^-|-$/g, '');
+  const streamers = await getCollection('streamers');
+  const bucket = new Map<string, { name: string; streamers: typeof streamers }>();
+  for (const s of streamers) {
+    const nat = s.data.nationality;
+    if (!nat) continue;
+    const parts = nat.split(/[-,]/).map((p) => p.trim()).filter(Boolean);
+    if (!parts.length) continue;
+    const key = slugify(parts[0]);
+    if (!key || key === 'unknown') continue;
+    if (!bucket.has(key)) bucket.set(key, { name: parts[0], streamers: [] as any });
+    bucket.get(key)!.streamers.push(s);
+  }
+  return [...bucket.entries()]
+    .filter(([, v]) => v.streamers.length >= 2)
+    .map(([slug, v]) => ({ params: { slug }, props: { slug, name: v.name, streamers: v.streamers.sort((a: any, b: any) => (b.data.followers ?? 0) - (a.data.followers ?? 0)) } }));
+}
+
+const { slug, name, streamers } = Astro.props as any;
+const title = `${name} streamers`;
+const description = `${name} streamers, broadcasters, and creators documented on Streamers.wiki — ${streamers.length} entries.`;
+---
+<BaseLayout title={title} description={description}>
+  <section class="hero" style="padding:3rem 0 1.8rem;">
+    <div class="container">
+      <h1>{name} streamers</h1>
+      <p>{streamers.length} streamers documented on Streamers.wiki whose primary nationality is {name}.</p>
+    </div>
+  </section>
+
+  <div class="container" style="padding:2rem 0;">
+    <div class="grid">
+      {streamers.map((e: any) => (
+        <EntityCard type="streamers" slug={e.id} name={e.data.name} description={e.data.description} tags={e.data.tags} meta={e.data.primary_platform} />
+      ))}
+    </div>
+  </div>
+</BaseLayout>

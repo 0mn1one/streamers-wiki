@@ -1,0 +1,70 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntityCard from '../../components/EntityCard.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const events = await getCollection('events');
+  const years = new Set<string>();
+  for (const e of events) {
+    const y = (e.data.date ?? '').slice(0, 4);
+    if (/^\d{4}$/.test(y)) years.add(y);
+  }
+  return [...years].sort().map((year) => ({ params: { year }, props: { year } }));
+}
+
+const { year } = Astro.props;
+const events = (await getCollection('events'))
+  .filter((e) => (e.data.date ?? '').startsWith(year))
+  .sort((a, b) => (a.data.date ?? '').localeCompare(b.data.date ?? ''));
+
+const streamers = (await getCollection('streamers'))
+  .filter((s) => s.data.started === year)
+  .sort((a, b) => (b.data.followers ?? 0) - (a.data.followers ?? 0));
+
+const title = `${year} in streaming`;
+const description = `Everything documented on Streamers.wiki from ${year}: ${events.length} events, ${streamers.length} streamers who started this year.`;
+---
+<BaseLayout title={title} description={description}>
+  <section class="hero" style="padding:3rem 0 1.8rem;">
+    <div class="container">
+      <h1>{year} in streaming</h1>
+      <p>A year-in-review of streaming culture, as documented on Streamers.wiki.</p>
+    </div>
+  </section>
+
+  <div class="container" style="padding:2rem 0;">
+    <section style="margin-bottom:2.5rem;">
+      <h2>Events</h2>
+      {events.length === 0 ? (
+        <p class="muted">No events documented for this year yet.</p>
+      ) : (
+        <div class="grid">
+          {events.map((e) => (
+            <EntityCard type="events" slug={e.id} name={e.data.name} description={e.data.description} tags={e.data.tags} meta={e.data.date} />
+          ))}
+        </div>
+      )}
+    </section>
+
+    {streamers.length > 0 && (
+      <section>
+        <h2>Streamers who started in {year}</h2>
+        <div class="grid">
+          {streamers.map((e) => (
+            <EntityCard type="streamers" slug={e.id} name={e.data.name} description={e.data.description} tags={e.data.tags} meta={e.data.primary_platform} />
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section style="margin-top:3rem;">
+      <h3 style="font-size:0.82rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-faint);font-weight:600;margin-bottom:0.8rem;">Jump to year</h3>
+      <div class="row">
+        {['2011','2014','2017','2018','2019','2020','2021','2022','2023','2024','2025','2026'].map((y) => (
+          <a href={`/y/${y}/`} class="pill" style={y === year ? 'color:var(--accent);border-color:var(--accent);' : ''}>{y}</a>
+        ))}
+      </div>
+    </section>
+  </div>
+</BaseLayout>

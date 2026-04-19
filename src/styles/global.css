@@ -296,6 +296,20 @@ img { max-width: 100%; height: auto; border-radius: var(--radius-sm); }
   border: 0;
 }
 .nav-links a:hover { color: var(--text); background: var(--bg-elev); }
+.nav-trending { display: inline-flex !important; align-items: center; gap: 0.4rem; color: var(--live-red) !important; }
+.nav-trending:hover { color: var(--live-red) !important; }
+.nav-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--live-red);
+  box-shadow: 0 0 8px var(--live-red);
+  animation: nav-pulse 1.8s ease-in-out infinite;
+}
+@keyframes nav-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
 .search-trigger {
   display: inline-flex;
   gap: 0.5rem;

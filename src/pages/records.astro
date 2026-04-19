@@ -1,0 +1,130 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { entryUrl } from '../lib/links';
+
+const streamers = await getCollection('streamers');
+
+type Row = {
+  label: string;
+  value: string;
+  context?: string;
+  date?: string;
+  streamerSlug: string;
+  streamerName: string;
+};
+
+const rows: Row[] = [];
+for (const s of streamers) {
+  for (const r of s.data.records ?? []) {
+    rows.push({
+      label: r.label,
+      value: String(r.value),
+      context: r.context,
+      date: r.date,
+      streamerSlug: s.id,
+      streamerName: s.data.name,
+    });
+  }
+}
+
+rows.sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
+
+const desc = 'Every all-time streaming record documented in one place — peak subs, peak concurrent viewers, contract values, subathon durations, and more.';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Hall of Records — Streamers.wiki',
+  description: desc,
+  url: 'https://streamers.wiki/records/',
+};
+---
+<BaseLayout title="Hall of Records" description={desc} jsonLd={jsonLd}>
+  <section class="hero" style="padding:3.2rem 0 2rem;">
+    <div class="container">
+      <h1>Hall of Records</h1>
+      <p>Every all-time streaming record documented on the wiki — peak subs, peak concurrent viewers, contract values, subathon durations, and more. Cross-indexed from every streamer page.</p>
+    </div>
+  </section>
+
+  <div class="container" style="padding:2rem 0;">
+    <p class="muted small">{rows.length} records across {new Set(rows.map((r) => r.streamerSlug)).size} streamers.</p>
+    <div class="records-wall">
+      {rows.map((r) => (
+        <a class="record-cell" href={entryUrl('streamers', r.streamerSlug)}>
+          <div class="rc-value">{r.value}</div>
+          <div class="rc-label">{r.label}</div>
+          <div class="rc-meta">
+            <span class="rc-streamer">{r.streamerName}</span>
+            {(r.context || r.date) && (
+              <span class="rc-context">{r.context}{r.context && r.date ? ' · ' : ''}{r.date}</span>
+            )}
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .records-wall {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 0.7rem;
+    margin-top: 1rem;
+  }
+  .record-cell {
+    display: block;
+    padding: 1.1rem 1.15rem 1.25rem;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 150ms ease, transform 150ms ease;
+  }
+  .record-cell::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent 70%);
+  }
+  .record-cell:hover {
+    border-color: color-mix(in oklab, var(--accent) 60%, var(--border));
+    transform: translateY(-1px);
+  }
+  .rc-value {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 1.9rem;
+    color: #fff;
+    letter-spacing: -0.035em;
+    line-height: 1;
+  }
+  .rc-label {
+    font-size: 0.84rem;
+    color: var(--text-dim);
+    margin-top: 0.45rem;
+    font-weight: 600;
+  }
+  .rc-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    margin-top: 0.55rem;
+  }
+  .rc-streamer {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--accent-pale);
+    letter-spacing: 0.01em;
+  }
+  .rc-context {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text-faint);
+  }
+</style>

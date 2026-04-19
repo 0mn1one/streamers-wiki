@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EntityCard from '../components/EntityCard.astro';
+import { getCollection } from 'astro:content';
+
+const events = (await getCollection('events'))
+  .filter((e) => (e.data.date ?? '') >= '2025-01-01')
+  .sort((a, b) => (b.data.date ?? '').localeCompare(a.data.date ?? ''));
+
+const recentStreamers = (await getCollection('streamers'))
+  .filter((s) => s.data.updated && s.data.updated >= '2026-01-01')
+  .sort((a, b) => (b.data.updated ?? '').localeCompare(a.data.updated ?? ''));
+
+const desc = 'The latest from streaming, documented in the last few months — recent deals, bans, subathons, milestones, platform moves.';
+---
+<BaseLayout title="Trending" description={desc}>
+  <section class="hero" style="padding:3rem 0 1.8rem;">
+    <div class="container">
+      <div class="row" style="justify-content:center;gap:0.6rem;">
+        <span style="width:10px;height:10px;border-radius:50%;background:var(--live-red);box-shadow:0 0 14px var(--live-red);animation:trend-pulse 1.6s ease-in-out infinite;"></span>
+        <h1 style="margin:0;">Trending</h1>
+      </div>
+      <p>What's moving in streaming right now — the latest deals, bans, subathons, platform moves and cultural moments documented on the wiki.</p>
+    </div>
+  </section>
+
+  <div class="container" style="padding:2rem 0;">
+    <section>
+      <h2>Events since 2025</h2>
+      <div class="grid">
+        {events.map((e) => (
+          <EntityCard type="events" slug={e.id} name={e.data.name} description={e.data.description} tags={e.data.tags} meta={e.data.date} />
+        ))}
+      </div>
+    </section>
+
+    {recentStreamers.length > 0 && (
+      <section style="margin-top:2.5rem;">
+        <h2>Recently-updated streamers</h2>
+        <div class="grid">
+          {recentStreamers.slice(0, 16).map((e) => (
+            <EntityCard type="streamers" slug={e.id} name={e.data.name} description={e.data.description} tags={e.data.tags} meta={e.data.primary_platform} />
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  @keyframes trend-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.6; }
+  }
+</style>
