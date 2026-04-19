@@ -17,6 +17,9 @@ handles:
   YouTube: https://www.youtube.com/@xQcOW
   X: https://x.com/xQc
 related: ['events:xqc-kick-deal-2023', 'concepts:react-content', 'platforms:kick', 'platforms:twitch', 'concepts:gta-rp', 'events:pogchamps-2020']
+influenced: ['streamers:kai-cenat']
+collaborators: ['streamers:trainwreckstv']
+rivals: ['streamers:destiny']
 tags: ['variety', 'canadian', 'english', 'just-chatting']
 description: French-Canadian former professional Overwatch player turned one of the most-watched variety streamers on Twitch, signed to a landmark non-exclusive Kick deal in 2023.
 sources:

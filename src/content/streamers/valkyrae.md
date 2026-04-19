@@ -15,6 +15,7 @@ handles:
   X: https://x.com/Valkyrae
   Instagram: https://www.instagram.com/valkyrae
 related: ['orgs:100-thieves', 'platforms:youtube-live', 'events:among-us-wave-2020', 'streamers:disguised-toast', 'streamers:sykkuno', 'streamers:corpse-husband']
+collaborators: ['streamers:pokimane', 'streamers:disguised-toast', 'streamers:sykkuno', 'streamers:corpse-husband']
 tags: ['variety', 'american', 'english', 'among-us']
 description: American creator who became YouTube Live's marquee streamer during the 2020 Among Us surge and was later named a co-owner of 100 Thieves.
 sources:

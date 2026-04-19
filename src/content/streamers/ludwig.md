@@ -15,6 +15,8 @@ handles:
   Twitch: https://www.twitch.tv/ludwig
   X: https://x.com/LudwigAhgren
 related: ['events:ludwig-subathon-2021', 'concepts:subathon', 'platforms:youtube-live']
+influenced: ['streamers:kai-cenat', 'streamers:ironmouse']
+collaborators: ['streamers:qtcinderella']
 tags: ['variety', 'american', 'english', 'poker']
 description: American streamer whose 31-day 2021 Twitch subathon set a concurrent-sub record and was followed by one of the first and largest YouTube Live exclusivity deals.
 sources:

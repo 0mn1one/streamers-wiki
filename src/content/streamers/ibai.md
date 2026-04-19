@@ -15,6 +15,7 @@ handles:
   YouTube: https://www.youtube.com/@ibai
   X: https://x.com/IbaiLlanos
 related: ['platforms:twitch', 'events:la-velada-iv-2024', 'orgs:koi', 'streamers:auronplay', 'streamers:rubius']
+collaborators: ['streamers:auronplay', 'streamers:rubius', 'streamers:thegrefg', 'streamers:elxokas', 'streamers:illojuan']
 tags: ['spanish', 'variety', 'football', 'events']
 description: Spanish Twitch streamer who co-founded KOI esports and produces the Evento annual awards and La Velada boxing event — the largest Spanish-language streaming phenomena.
 sources:

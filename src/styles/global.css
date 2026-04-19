@@ -69,6 +69,21 @@ a {
 }
 a:hover { border-bottom-color: currentColor; }
 
+/* Auto-linked prose mentions — subtle dotted underline that reveals on hover */
+.prose a.wikilink {
+  color: inherit;
+  border-bottom: 1px dotted color-mix(in oklab, var(--accent) 55%, transparent);
+}
+.prose a.wikilink:hover {
+  color: var(--accent);
+  border-bottom: 1px solid var(--accent);
+}
+.prose a.wikilink[data-wiki-type="streamers"]:hover { color: var(--streamer); border-bottom-color: var(--streamer); }
+.prose a.wikilink[data-wiki-type="platforms"]:hover { color: var(--platform); border-bottom-color: var(--platform); }
+.prose a.wikilink[data-wiki-type="events"]:hover { color: var(--event); border-bottom-color: var(--event); }
+.prose a.wikilink[data-wiki-type="concepts"]:hover { color: var(--concept); border-bottom-color: var(--concept); }
+.prose a.wikilink[data-wiki-type="orgs"]:hover { color: var(--org); border-bottom-color: var(--org); }
+
 h1, h2, h3, h4 {
   font-family: var(--display);
   font-weight: 800;

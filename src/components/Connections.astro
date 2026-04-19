@@ -1,0 +1,90 @@
+---
+import { resolveRef } from '../lib/links';
+
+interface Props {
+  influenced_by?: string[];
+  influenced?: string[];
+  collaborators?: string[];
+  rivals?: string[];
+  successors?: string[];
+}
+const { influenced_by = [], influenced = [], collaborators = [], rivals = [], successors = [] } = Astro.props as Props;
+
+const rows: { label: string; color: string; refs: string[] }[] = [
+  { label: 'Influenced by', color: 'var(--accent-pale)', refs: influenced_by },
+  { label: 'Influenced', color: 'var(--accent)', refs: influenced },
+  { label: 'Collaborators', color: 'var(--online-green)', refs: collaborators },
+  { label: 'Rivals', color: 'var(--live-red)', refs: rivals },
+  { label: 'Successors', color: 'var(--concept)', refs: successors },
+].filter((r) => r.refs.length > 0);
+
+if (rows.length === 0) return null;
+---
+<section class="connections" id="connections">
+  <h2>Connections</h2>
+  <dl class="conn-list">
+    {rows.map((r) => (
+      <>
+        <dt style={`--c:${r.color}`}>{r.label}</dt>
+        <dd>
+          {r.refs.map((ref) => {
+            const resolved = resolveRef(ref);
+            if (!resolved) return null;
+            const label = ref.split(':')[1]?.replace(/-/g, ' ');
+            return <a href={resolved.url} class="conn-chip" style={`--c:${r.color}`}>{label}</a>;
+          })}
+        </dd>
+      </>
+    ))}
+  </dl>
+</section>
+
+<style>
+  .connections { margin: 2rem 0; }
+  .conn-list {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 1rem 1.1rem;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .conn-list dt {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    color: var(--c);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .conn-list dt::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--c);
+  }
+  .conn-list dd {
+    margin: 0.2rem 0 0;
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+  .conn-chip {
+    display: inline-flex;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--c) 8%, var(--bg));
+    border: 1px solid color-mix(in oklab, var(--c) 30%, var(--border));
+    color: var(--c);
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    font-family: var(--mono);
+  }
+  .conn-chip:hover { filter: brightness(1.2); border-color: var(--c); }
+</style>

@@ -17,6 +17,8 @@ handles:
   Instagram: https://www.instagram.com/ishowspeed
   TikTok: https://www.tiktok.com/@ishowspeed
 related: ['platforms:youtube-live', 'concepts:irl', 'events:speed-ronaldo-meeting-2024', 'events:sidemen-charity-match-2023', 'streamers:ksi']
+influenced_by: ['streamers:ksi']
+collaborators: ['streamers:ksi', 'streamers:miniminter']
 tags: ['irl', 'variety', 'football', 'american', 'english', 'youtube']
 description: American YouTube streamer whose high-energy reactions, global IRL tours, and obsession with Cristiano Ronaldo have made him one of the largest creator brands of the 2020s.
 sources:

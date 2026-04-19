@@ -14,6 +14,9 @@ handles:
   YouTube: https://www.youtube.com/@ksi
   X: https://x.com/KSI
 related: ['orgs:misfits', 'events:ksi-vs-logan-paul-2', 'events:sidemen-charity-match-2023', 'streamers:miniminter', 'streamers:vikkstar', 'streamers:w2s', 'streamers:zerkaa', 'streamers:tbjzl', 'streamers:behzinga']
+rivals: ['streamers:logan-paul']
+collaborators: ['streamers:miniminter', 'streamers:vikkstar', 'streamers:w2s']
+successors: ['streamers:ishowspeed']
 tags: ['british', 'variety', 'music', 'boxing']
 description: British YouTube creator, Sidemen co-founder, professional boxer, and co-founder of the Prime Hydration beverage with Logan Paul.
 sources:

@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
+import rehypeWikiLinks from './src/lib/wikilinks.mjs';
 
 // https://astro.build/config
 export default defineConfig({
@@ -18,6 +19,7 @@ export default defineConfig({
       theme: 'github-dark-dimmed',
       wrap: true,
     },
+    rehypePlugins: [rehypeWikiLinks],
   },
   build: {
     format: 'directory',

@@ -16,6 +16,7 @@ handles:
   Twitch: https://www.twitch.tv/disguisedtoast
   X: https://x.com/DisguisedToast
 related: ['orgs:offline-tv', 'events:among-us-wave-2020', 'streamers:pokimane', 'streamers:sykkuno']
+collaborators: ['streamers:valkyrae', 'streamers:pokimane', 'streamers:sykkuno', 'streamers:lilypichu']
 tags: ['variety', 'among-us', 'hearthstone', 'business']
 description: Canadian streamer and entrepreneur, Offline TV member, and founder of the esports organization Disguised that acquired DSG Valorant in 2023.
 sources: []

@@ -16,6 +16,7 @@ handles:
   YouTube: https://www.youtube.com/@HasanAbi
   X: https://x.com/hasanthehun
 related: ['platforms:twitch', 'concepts:just-chatting', 'events:among-us-wave-2020']
+rivals: ['streamers:destiny']
 tags: ['politics', 'american', 'english', 'just-chatting']
 description: Turkish-American political commentator and the most-watched political streamer on Twitch, formerly of The Young Turks.
 sources:

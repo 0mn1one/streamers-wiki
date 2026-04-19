@@ -15,6 +15,8 @@ handles:
   YouTube: https://www.youtube.com/@Ninja
   X: https://x.com/Ninja
 related: ['platforms:twitch', 'events:mixer-shutdown-2020', 'events:ninja-drake-fortnite-2018']
+influenced: ['streamers:tfue', 'streamers:myth', 'streamers:clix']
+successors: ['streamers:xqc', 'streamers:kai-cenat']
 tags: ['fortnite', 'american', 'english', 'gaming']
 description: American streamer who was the first gaming creator to reach mainstream household-name status, driven by his Fortnite dominance during the game's 2017–2018 peak.
 sources:

@@ -16,6 +16,7 @@ handles:
   YouTube: https://www.youtube.com/@elrubiusOMG
   X: https://x.com/Rubiu5
 related: ['platforms:twitch', 'streamers:ibai', 'streamers:auronplay']
+collaborators: ['streamers:ibai', 'streamers:auronplay']
 tags: ['spanish', 'variety', 'gaming']
 description: Spanish-Norwegian creator who became one of YouTube's largest Spanish-language channels in the 2010s, later transitioning to Twitch as a headline Spanish streamer.
 sources:

@@ -15,6 +15,7 @@ handles:
   YouTube: https://www.youtube.com/@shroud
   X: https://x.com/shroud
 related: ['platforms:twitch', 'events:mixer-shutdown-2020']
+collaborators: ['streamers:ninja']
 tags: ['fps', 'canadian', 'english', 'gaming']
 description: Canadian former Cloud9 CS pro widely considered one of the most mechanically talented FPS players in streaming history.
 sources:

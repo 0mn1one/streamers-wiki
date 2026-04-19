@@ -14,6 +14,7 @@ handles:
   Twitch: https://www.twitch.tv/botezlive
   YouTube: https://www.youtube.com/@BotezLive
 related: ['platforms:twitch', 'streamers:gmhikaru']
+collaborators: ['streamers:gmhikaru']
 tags: ['chess', 'variety']
 description: Sister duo Alexandra and Andrea Botez, co-hosts of the BotezLive Twitch and YouTube channels, formative figures in bringing chess to mainstream streaming audiences.
 sources: []

@@ -14,6 +14,7 @@ handles:
   YouTube: https://www.youtube.com/@LoganPaulVlogs
   X: https://x.com/LoganPaul
 related: ['events:ksi-vs-logan-paul-2', 'events:sidemen-charity-match-2023', 'streamers:ksi']
+rivals: ['streamers:ksi']
 tags: ['american', 'vlog', 'boxing', 'podcast']
 description: American YouTube creator, podcaster (Impaulsive), professional wrestler with WWE, and Prime Hydration co-founder.
 sources:

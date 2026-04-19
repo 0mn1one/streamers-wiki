@@ -15,6 +15,7 @@ handles:
   YouTube: https://www.youtube.com/@pokimanelol
   X: https://x.com/pokimanelol
 related: ['platforms:twitch', 'platforms:youtube-live', 'events:pokimane-youtube-exit-2024', 'events:twitch-gambling-ban-2022', 'events:atrioc-deepfake-2023', 'events:among-us-wave-2020', 'orgs:offline-tv']
+collaborators: ['streamers:valkyrae', 'streamers:disguised-toast', 'streamers:lilypichu', 'streamers:scarra', 'streamers:sykkuno']
 tags: ['variety', 'canadian', 'english', 'just-chatting']
 description: One of the most-followed female streamers in history, Pokimane left Twitch for a YouTube exclusivity deal in early 2024 after a decade on the platform.
 sources:

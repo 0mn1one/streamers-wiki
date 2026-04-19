@@ -14,6 +14,7 @@ handles:
   YouTube: https://www.youtube.com/@mizkif
   X: https://x.com/REALMizkif
 related: ['orgs:otk', 'platforms:twitch', 'events:twitch-gambling-ban-2022']
+collaborators: ['streamers:asmongold', 'streamers:sodapoppin', 'streamers:emiru']
 tags: ['variety', 'american', 'english', 'just-chatting', 'austin']
 description: American variety streamer and co-founder of OTK, known for elaborate in-person stream production and community game shows.
 sources:

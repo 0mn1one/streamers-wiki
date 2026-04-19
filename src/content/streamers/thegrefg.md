@@ -15,6 +15,7 @@ handles:
   YouTube: https://www.youtube.com/@TheGrefg
   X: https://x.com/TheGrefg
 related: ['platforms:twitch', 'streamers:ibai']
+collaborators: ['streamers:ibai']
 tags: ['spanish', 'fortnite', 'variety', 'record']
 description: Spanish Fortnite streamer who set the Twitch concurrent-viewership record in 2021 with the reveal of his in-game Fortnite skin, briefly holding the all-time Twitch record.
 sources:

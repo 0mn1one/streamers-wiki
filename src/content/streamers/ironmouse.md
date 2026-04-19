@@ -13,6 +13,7 @@ handles:
   YouTube: https://www.youtube.com/@ironmouseparty
   X: https://x.com/ironmouse
 related: ['platforms:twitch', 'concepts:subathon', 'concepts:vtuber', 'orgs:vshojo']
+influenced_by: ['streamers:ludwig']
 tags: ['vtuber', 'english', 'variety']
 description: The most-subscribed VTuber in Twitch history, whose 2024 subathon briefly set the Twitch all-time active-sub record.
 sources: []

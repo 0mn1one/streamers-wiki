@@ -16,6 +16,7 @@ handles:
   YouTube: https://www.youtube.com/@destiny
   X: https://x.com/TheOmniLiberal
 related: ['platforms:kick', 'streamers:hasanabi']
+rivals: ['streamers:hasanabi', 'streamers:xqc']
 tags: ['politics', 'debate', 'variety']
 description: American political commentator and debate streamer, one of the longest-tenured political voices in the streaming medium, permanently banned from Twitch in 2020.
 sources:

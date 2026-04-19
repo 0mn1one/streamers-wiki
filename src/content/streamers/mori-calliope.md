@@ -13,6 +13,7 @@ verified: true
 handles:
   YouTube: https://www.youtube.com/@MoriCalliope
 related: ['orgs:hololive', 'concepts:vtuber', 'events:hololive-en-myth-debut-2020']
+collaborators: ['streamers:gawr-gura', 'streamers:takanashi-kiara']
 tags: ['vtuber', 'hololive', 'english', 'music']
 description: Grim Reaper-themed VTuber from Hololive EN Myth whose music career crossed into mainstream Billboard and J-pop charts.
 sources: []

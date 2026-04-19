@@ -16,6 +16,7 @@ handles:
   YouTube: https://www.youtube.com/@Miniminter
   X: https://x.com/miniminter
 related: ['orgs:misfits', 'streamers:ksi', 'events:sidemen-charity-match-2023']
+collaborators: ['streamers:ksi', 'streamers:vikkstar', 'streamers:w2s', 'streamers:tbjzl', 'streamers:behzinga', 'streamers:zerkaa']
 tags: ['british', 'sidemen', 'fifa', 'football']
 description: Founding member of the Sidemen and one of the UK's most-followed creators, best known for FIFA content and the Sidemen business empire.
 sources: []

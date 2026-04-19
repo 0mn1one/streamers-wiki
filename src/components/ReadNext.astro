@@ -1,0 +1,104 @@
+---
+import { buildGraph, entryId, type EntityType } from '../lib/links';
+import EntityCard from './EntityCard.astro';
+
+interface Props {
+  type: EntityType;
+  slug: string;
+  limit?: number;
+}
+const { type, slug, limit = 6 } = Astro.props as Props;
+
+const { nodes, edges } = await buildGraph();
+const selfId = entryId(type, slug);
+
+const neighborScore = new Map<string, number>();
+const direct = new Set<string>();
+
+for (const e of edges) {
+  if (e.source === selfId) {
+    neighborScore.set(e.target, (neighborScore.get(e.target) ?? 0) + 5);
+    direct.add(e.target);
+  } else if (e.target === selfId) {
+    neighborScore.set(e.source, (neighborScore.get(e.source) ?? 0) + 5);
+    direct.add(e.source);
+  }
+}
+
+// Second hop: nodes sharing a neighbor with self get partial credit.
+for (const d of direct) {
+  for (const e of edges) {
+    const other = e.source === d ? e.target : e.target === d ? e.source : null;
+    if (!other || other === selfId || direct.has(other)) continue;
+    neighborScore.set(other, (neighborScore.get(other) ?? 0) + 2);
+  }
+}
+
+const self = nodes.find((n) => n.id === selfId);
+if (self) {
+  // Shared-tag bonus
+  for (const n of nodes) {
+    if (n.id === selfId) continue;
+    const shared = n.tags.filter((t) => self.tags.includes(t)).length;
+    if (shared > 0) neighborScore.set(n.id, (neighborScore.get(n.id) ?? 0) + shared);
+  }
+}
+
+const byId = new Map(nodes.map((n) => [n.id, n]));
+const recs = [...neighborScore.entries()]
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, limit)
+  .map(([id]) => byId.get(id))
+  .filter((n): n is NonNullable<typeof n> => Boolean(n));
+---
+{recs.length > 0 && (
+  <section class="read-next">
+    <h3 class="rn-heading">
+      <span class="rn-arrow" aria-hidden="true">→</span>
+      Read next
+    </h3>
+    <div class="rn-grid">
+      {recs.map((n) => (
+        <EntityCard
+          type={n.type}
+          slug={n.slug}
+          name={n.name}
+          description={n.description}
+          tags={n.tags.slice(0, 3)}
+        />
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .read-next {
+    margin-top: 3rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--border);
+  }
+  .rn-heading {
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-faint);
+    font-weight: 700;
+    margin: 0 0 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 0;
+    padding: 0;
+  }
+  .rn-arrow {
+    color: var(--accent);
+    font-family: var(--display);
+    font-weight: 900;
+  }
+  .rn-grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+</style>

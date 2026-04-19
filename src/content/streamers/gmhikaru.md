@@ -16,6 +16,7 @@ handles:
   YouTube: https://www.youtube.com/@GMHikaru
   X: https://x.com/GMHikaru
 related: ['platforms:twitch']
+collaborators: ['streamers:botezlive']
 tags: ['chess', 'grandmaster', 'variety']
 description: American chess Grandmaster, five-time US Chess Champion, and one of Twitch's most-watched chess streamers — central to the 2020–2022 chess-streaming boom.
 sources:

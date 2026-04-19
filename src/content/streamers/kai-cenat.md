@@ -16,6 +16,9 @@ handles:
   YouTube: https://www.youtube.com/@KaiCenat
   Instagram: https://www.instagram.com/kaicenat
 related: ['concepts:subathon', 'platforms:twitch', 'events:streamer-awards', 'events:mafiathon-1-2023', 'events:mafiathon-2-2024', 'events:kai-cenat-union-square-2023', 'orgs:amp']
+influenced_by: ['streamers:ludwig', 'streamers:xqc']
+collaborators: ['streamers:fanum', 'streamers:duke-dennis', 'streamers:agent-00', 'streamers:stable-ronaldo']
+successors: ['streamers:plaqueboymax', 'streamers:caseoh']
 tags: ['variety', 'american', 'english', 'just-chatting']
 description: American streamer who broke the Twitch all-time concurrent-subscriber record twice with his "Mafiathon" subathon events, widely considered the defining streamer of the early-2020s era.
 sources:

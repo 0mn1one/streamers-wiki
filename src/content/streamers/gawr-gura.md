@@ -14,6 +14,7 @@ handles:
   YouTube: https://www.youtube.com/@GawrGura
   X: https://x.com/gawrgura
 related: ['orgs:hololive', 'platforms:youtube-live', 'concepts:vtuber']
+collaborators: ['streamers:mori-calliope', 'streamers:takanashi-kiara']
 tags: ['vtuber', 'hololive', 'english', 'gaming']
 description: The most-subscribed VTuber in history and a founding member of Hololive English's first-generation "Myth" — widely credited with bringing VTubing into the English-speaking mainstream.
 sources:

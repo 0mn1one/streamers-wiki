@@ -15,6 +15,7 @@ handles:
   YouTube: https://www.youtube.com/@Sykkuno
   X: https://x.com/Sykkuno
 related: ['orgs:offline-tv', 'events:among-us-wave-2020', 'streamers:valkyrae']
+collaborators: ['streamers:valkyrae', 'streamers:disguised-toast', 'streamers:pokimane']
 tags: ['variety', 'wholesome', 'gaming']
 description: American creator whose low-key style and Among Us 2020 wave involvement made him one of the first major Twitch-to-YouTube exclusive moves.
 sources: []

@@ -15,6 +15,7 @@ handles:
   YouTube: https://www.youtube.com/@Asmongold
   X: https://x.com/asmongold
 related: ['orgs:otk', 'platforms:twitch', 'events:twitch-gambling-ban-2022']
+collaborators: ['streamers:mizkif', 'streamers:sodapoppin', 'streamers:lacari']
 tags: ['wow', 'mmo', 'american', 'english', 'variety']
 description: American MMO and variety streamer, co-founder of OTK, and one of the most-watched World of Warcraft creators in the game's streaming history.
 sources:

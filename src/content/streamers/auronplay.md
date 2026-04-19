@@ -15,6 +15,7 @@ handles:
   YouTube: https://www.youtube.com/@AuronPlay
   X: https://x.com/auronplay
 related: ['platforms:twitch', 'streamers:ibai', 'streamers:rubius', 'events:la-velada-iv-2024']
+collaborators: ['streamers:ibai', 'streamers:rubius']
 tags: ['spanish', 'variety', 'comedy', 'just-chatting']
 description: One of the most-followed Spanish-language creators on Twitch and a founding figure of modern Spanish streaming culture.
 sources:

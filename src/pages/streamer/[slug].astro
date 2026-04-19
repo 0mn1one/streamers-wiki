@@ -9,6 +9,8 @@ import StreamerTimeline from '../../components/StreamerTimeline.astro';
 import StreamerRecords from '../../components/StreamerRecords.astro';
 import StreamerQuotes from '../../components/StreamerQuotes.astro';
 import StreamerControversies from '../../components/StreamerControversies.astro';
+import Connections from '../../components/Connections.astro';
+import ReadNext from '../../components/ReadNext.astro';
 import { entryId } from '../../lib/links';
 import { platformTheme, platformVars } from '../../lib/platform-theme';
 
@@ -87,6 +89,16 @@ const jsonLd = {
 
   {d.quotes && d.quotes.length > 0 && <StreamerQuotes items={d.quotes} />}
   {d.controversies && d.controversies.length > 0 && <StreamerControversies items={d.controversies} />}
+
+  <Connections
+    influenced_by={d.influenced_by}
+    influenced={d.influenced}
+    collaborators={d.collaborators}
+    rivals={d.rivals}
+    successors={d.successors}
+  />
+
+  <ReadNext type="streamers" slug={entry.id} limit={6} />
 
   <section class="backlinks">
     <h3>Neighborhood</h3>

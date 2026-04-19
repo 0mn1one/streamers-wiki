@@ -14,6 +14,7 @@ handles:
   Kick: https://kick.com/trainwreckstv
   X: https://x.com/Trainwreckstv
 related: ['platforms:kick', 'events:twitch-gambling-ban-2022']
+collaborators: ['streamers:xqc']
 tags: ['slots', 'gambling', 'kick']
 description: American streamer and co-founding figure of Kick, historically one of the most prominent slots-gambling streamers, now a Kick advocate and executive presence.
 sources: []

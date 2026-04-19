@@ -14,6 +14,7 @@ handles:
   YouTube: https://www.youtube.com/@DukeDennis
   Twitch: https://www.twitch.tv/dukedennis
 related: ['orgs:amp', 'streamers:kai-cenat']
+collaborators: ['streamers:kai-cenat', 'streamers:fanum', 'streamers:agent-00']
 tags: ['amp', 'nba2k', 'variety']
 description: AMP co-founder and one of the most-subscribed NBA 2K creators on YouTube.
 sources: []

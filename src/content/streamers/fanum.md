@@ -13,6 +13,7 @@ verified: true
 handles:
   YouTube: https://www.youtube.com/@Fanum
 related: ['orgs:amp', 'streamers:kai-cenat']
+collaborators: ['streamers:kai-cenat', 'streamers:duke-dennis', 'streamers:agent-00']
 tags: ['amp', 'variety', 'just-chatting']
 description: Co-founder of AMP with Kai Cenat, known for the "Fanum tax" meme that crossed into mainstream Gen Z culture in 2023.
 sources: []

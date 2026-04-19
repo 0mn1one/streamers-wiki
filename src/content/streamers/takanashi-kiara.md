@@ -13,6 +13,7 @@ verified: true
 handles:
   YouTube: https://www.youtube.com/@TakanashiKiara
 related: ['orgs:hololive', 'concepts:vtuber', 'events:hololive-en-myth-debut-2020']
+collaborators: ['streamers:gawr-gura', 'streamers:mori-calliope']
 tags: ['vtuber', 'hololive', 'english', 'trilingual']
 description: Hololive EN Myth member and trilingual (English/Japanese/German) VTuber known for an unusually structured content schedule and music career.
 sources: []
