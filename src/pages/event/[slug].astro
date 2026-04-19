@@ -1,0 +1,40 @@
+---
+import { getCollection, render } from 'astro:content';
+import WikiLayout from '../../layouts/WikiLayout.astro';
+import Graph from '../../components/Graph.astro';
+import { entryId } from '../../lib/links';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('events');
+  return entries.map((e) => ({ params: { slug: e.id }, props: { entry: e } }));
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+const d = entry.data;
+
+const infobox = [
+  { label: 'Date', value: d.date },
+  { label: 'End date', value: d.end_date },
+  { label: 'Type', value: d.type },
+  { label: 'Participants', value: d.participants },
+  { label: 'Platforms', value: d.platforms },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Event',
+  name: d.name,
+  description: d.description,
+  startDate: d.date,
+  endDate: d.end_date,
+};
+---
+<WikiLayout type="events" slug={entry.id} title={d.name} description={d.description}
+  updated={d.updated} tags={d.tags} sources={d.sources} infobox={infobox} jsonLd={jsonLd} headings={headings}>
+  <Content />
+  <section class="backlinks">
+    <h3>Neighborhood</h3>
+    <Graph focusId={entryId('events', entry.id)} height="420px" />
+  </section>
+</WikiLayout>

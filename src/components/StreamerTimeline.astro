@@ -1,0 +1,118 @@
+---
+import { resolveRef } from '../lib/links';
+
+interface TimelineItem {
+  date: string;
+  label: string;
+  note?: string;
+  kind?: string;
+  ref?: string;
+}
+interface Props {
+  items: TimelineItem[];
+}
+const { items } = Astro.props as Props;
+if (!items || items.length === 0) return null;
+
+const kindColor: Record<string, string> = {
+  start: '#7c5cff',
+  platform: '#00c2ff',
+  deal: '#21d07a',
+  ban: '#ff3b3b',
+  record: '#ffb020',
+  event: '#ff6fa5',
+  business: '#9776ff',
+  other: '#6f6d7e',
+};
+
+const sorted = [...items].sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''));
+---
+<section class="timeline" id="timeline">
+  <h2>Career timeline</h2>
+  <ol class="tl-list">
+    {sorted.map((item) => {
+      const ref = item.ref ? resolveRef(item.ref) : null;
+      const color = kindColor[item.kind ?? 'other'] ?? kindColor.other;
+      return (
+        <li class="tl-item" style={`--dot:${color}`}>
+          <div class="tl-dot" aria-hidden="true"></div>
+          <div class="tl-body">
+            <div class="tl-date">{item.date}</div>
+            <div class="tl-label">
+              {ref ? <a href={ref.url}>{item.label}</a> : <span>{item.label}</span>}
+              {item.kind && <span class="tl-kind" style={`color:${color}`}>{item.kind}</span>}
+            </div>
+            {item.note && <div class="tl-note">{item.note}</div>}
+          </div>
+        </li>
+      );
+    })}
+  </ol>
+</section>
+
+<style>
+  .timeline { margin: 2.2rem 0; }
+  .tl-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+  }
+  .tl-list::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 4px;
+    bottom: 4px;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, var(--border) 8%, var(--border) 92%, transparent);
+  }
+  .tl-item {
+    position: relative;
+    padding: 0.55rem 0 0.55rem 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .tl-dot {
+    position: absolute;
+    left: 0;
+    top: 0.95rem;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--dot);
+    box-shadow: 0 0 0 3px var(--bg);
+  }
+  .tl-date {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--text-faint);
+    letter-spacing: 0.03em;
+    margin-bottom: 0.1rem;
+  }
+  .tl-label {
+    font-size: 0.98rem;
+    color: var(--text);
+    font-weight: 600;
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+  .tl-label a { color: var(--accent-pale); border: 0; }
+  .tl-label a:hover { color: var(--accent); }
+  .tl-kind {
+    font-family: var(--mono);
+    font-size: 0.64rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+  }
+  .tl-note {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-top: 0.15rem;
+    line-height: 1.5;
+  }
+</style>

@@ -1,0 +1,150 @@
+---
+import { buildGraph, ENTITY_COLOR } from '../lib/links';
+
+export interface Props {
+  focusId?: string;
+  height?: string;
+}
+const { focusId, height = 'calc(100vh - 160px)' } = Astro.props as Props;
+const graph = await buildGraph();
+const colors = ENTITY_COLOR;
+const payload = JSON.stringify({ ...graph, focusId, colors });
+---
+<div class="graph-wrap" style={`height:${height};`}>
+  <div id="graph"></div>
+  <div class="graph-legend">
+    <div><span class="dot" style="background:#8b5cf6"></span>Streamer</div>
+    <div><span class="dot" style="background:#22d3ee"></span>Platform</div>
+    <div><span class="dot" style="background:#f59e0b"></span>Concept</div>
+    <div><span class="dot" style="background:#ef4444"></span>Event</div>
+    <div><span class="dot" style="background:#10b981"></span>Organization</div>
+  </div>
+  <div class="graph-controls">
+    <button id="graph-fit" title="Fit to screen">Fit</button>
+    <button id="graph-replay" title="Re-run layout">Replay</button>
+  </div>
+  <div class="graph-tooltip" id="graph-tooltip"></div>
+</div>
+<script type="application/json" id="graph-data" set:html={payload}></script>
+<script>
+  import cytoscape from 'cytoscape';
+  // @ts-expect-error no types
+  import coseBilkent from 'cytoscape-cose-bilkent';
+  cytoscape.use(coseBilkent);
+
+  const { nodes, edges, focusId, colors } = JSON.parse(document.getElementById('graph-data')!.textContent!);
+  const container = document.getElementById('graph')!;
+  const tooltip = document.getElementById('graph-tooltip')!;
+
+  const cy = cytoscape({
+    container,
+    elements: [
+      ...nodes.map((n: any) => ({
+        data: { id: n.id, label: n.name, type: n.type, url: n.url, description: n.description, degree: n.degree ?? 0 },
+      })),
+      ...edges.map((e: any, i: number) => ({
+        data: { id: `e${i}`, source: e.source, target: e.target, kind: e.kind },
+      })),
+    ],
+    style: [
+      {
+        selector: 'node',
+        style: {
+          'background-color': (ele: any) => colors[ele.data('type')] ?? '#888',
+          'label': 'data(label)',
+          'color': '#e6e8eb',
+          'font-size': 10,
+          'font-family': 'Inter, system-ui, sans-serif',
+          'text-valign': 'bottom',
+          'text-margin-y': 6,
+          'text-outline-width': 2,
+          'text-outline-color': '#0b0d10',
+          'width': (ele: any) => 10 + Math.min(24, (ele.data('degree') ?? 0) * 2),
+          'height': (ele: any) => 10 + Math.min(24, (ele.data('degree') ?? 0) * 2),
+          'border-width': 0,
+          'transition-property': 'background-color, width, height, border-width',
+          'transition-duration': 180,
+        },
+      },
+      {
+        selector: 'node:hover',
+        style: { 'border-width': 2, 'border-color': '#fff' },
+      },
+      {
+        selector: 'node.focus',
+        style: { 'border-width': 3, 'border-color': '#a78bfa' },
+      },
+      {
+        selector: 'node.faded',
+        style: { 'opacity': 0.15 },
+      },
+      {
+        selector: 'edge',
+        style: {
+          'width': 1,
+          'line-color': '#2b313b',
+          'curve-style': 'bezier',
+          'opacity': 0.7,
+        },
+      },
+      {
+        selector: 'edge.highlight',
+        style: { 'line-color': '#a78bfa', 'opacity': 1, 'width': 2 },
+      },
+      {
+        selector: 'edge.faded',
+        style: { 'opacity': 0.08 },
+      },
+    ],
+    layout: {
+      name: 'cose-bilkent',
+      animate: 'end',
+      animationDuration: 600,
+      idealEdgeLength: 80,
+      nodeRepulsion: 5500,
+      edgeElasticity: 0.4,
+      gravity: 0.25,
+      numIter: 2500,
+      tile: true,
+      randomize: true,
+    } as any,
+    wheelSensitivity: 0.2,
+    minZoom: 0.2,
+    maxZoom: 3,
+  });
+
+  cy.on('mouseover', 'node', (evt) => {
+    const node = evt.target;
+    const pos = evt.renderedPosition || node.renderedPosition();
+    tooltip.innerHTML = `<strong>${node.data('label')}</strong><div class="muted small">${node.data('description') || ''}</div>`;
+    tooltip.style.display = 'block';
+    tooltip.style.left = pos.x + 14 + 'px';
+    tooltip.style.top = pos.y + 14 + 'px';
+
+    const neighborhood = node.closedNeighborhood();
+    cy.elements().addClass('faded');
+    neighborhood.removeClass('faded');
+    neighborhood.connectedEdges().addClass('highlight');
+  });
+  cy.on('mouseout', 'node', () => {
+    tooltip.style.display = 'none';
+    cy.elements().removeClass('faded highlight');
+  });
+  cy.on('tap', 'node', (evt) => {
+    const url = evt.target.data('url');
+    if (url) window.location.href = url;
+  });
+
+  document.getElementById('graph-fit')!.addEventListener('click', () => cy.fit(undefined, 40));
+  document.getElementById('graph-replay')!.addEventListener('click', () => cy.layout({ name: 'cose-bilkent', animate: 'end', animationDuration: 600 } as any).run());
+
+  if (focusId) {
+    const target = cy.getElementById(focusId);
+    if (target.length) {
+      target.addClass('focus');
+      setTimeout(() => {
+        cy.animate({ center: { eles: target }, zoom: 1.4, duration: 600 });
+      }, 700);
+    }
+  }
+</script>

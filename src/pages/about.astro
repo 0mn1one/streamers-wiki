@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="About" description="Streamers.wiki is an open, LLM-friendly wiki for streaming culture — built to be read by humans and understood natively by machines.">
+  <div class="container" style="padding:2.5rem 0;max-width:780px;">
+    <h1>About Streamers.wiki</h1>
+    <p class="muted" style="font-size:1.1rem;">A community wiki for streamers, streaming platforms, creators and the culture around them.</p>
+
+    <h2>Why this exists</h2>
+    <p>Streaming is one of the defining media of this era. Billions of hours are watched every year, entire careers and subcultures are born on platforms like Twitch, Kick, YouTube and TikTok Live — yet the knowledge around it is scattered across Reddit threads, Wikipedia fragments, clip channels, Discord servers and half-dead forum posts. Streamers.wiki pulls that knowledge into one canonical, cross-linked reference that anyone can read and anyone can contribute to.</p>
+
+    <h2>Built for humans <em>and</em> machines</h2>
+    <p>The site follows the <a href="https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f" rel="noopener">Karpathy LLM-wiki pattern</a>: plain markdown as the canonical format, structured frontmatter for every entity, explicit cross-links between streamers, platforms, concepts, events and organizations.</p>
+    <p>We also ship:</p>
+    <ul>
+      <li>A <a href="/llms.txt">/llms.txt</a> index following the <a href="https://llmstxt.org/" rel="noopener">Answer.AI proposal</a></li>
+      <li>A full knowledge dump at <a href="/llms-full.txt">/llms-full.txt</a></li>
+      <li>A <code>.md</code> twin for every page (just append <code>.md</code> to any entry URL)</li>
+      <li>JSON-LD structured data on every page</li>
+      <li>A live <a href="/graph/">graph view</a> of every entity and relationship</li>
+    </ul>
+
+    <h2>Neutral, sourced, editable</h2>
+    <p>Entries aim for a neutral, encyclopedic tone. Claims that aren't obviously true should carry a source. Where streamers or platforms have multiple sides to a story, we describe the positions without picking one. Drama pages document what happened; they don't take sides.</p>
+
+    <h2>Who's behind it</h2>
+    <p>Streamers.wiki is part of <a href="https://0mn1.one" rel="noopener">0mn1.one</a> — a values-aligned commerce channel building toward worldwide abundance. This project funds that mission.</p>
+
+    <h2>License</h2>
+    <p>All wiki content is licensed <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener">CC BY-SA 4.0</a>. Use it, remix it, train on it — just attribute and share alike.</p>
+  </div>
+</BaseLayout>

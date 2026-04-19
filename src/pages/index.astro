@@ -1,0 +1,162 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EntityCard from '../components/EntityCard.astro';
+import RecentlyUpdated from '../components/RecentlyUpdated.astro';
+import { loadAllEntries } from '../lib/links';
+
+const all = await loadAllEntries();
+const byFollowers = [...all.streamers].sort((a, b) => (b.data.followers ?? 0) - (a.data.followers ?? 0));
+const featured = byFollowers.slice(0, 8);
+const topConcepts = all.concepts.slice(0, 6);
+const recentEvents = [...all.events].sort((a, b) => (b.data.date ?? '').localeCompare(a.data.date ?? '')).slice(0, 4);
+
+const counts = {
+  streamers: all.streamers.length,
+  platforms: all.platforms.length,
+  concepts: all.concepts.length,
+  events: all.events.length,
+  orgs: all.orgs.length,
+};
+const total = Object.values(counts).reduce((a, b) => a + b, 0);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Streamers.wiki',
+  url: 'https://streamers.wiki',
+  description: 'A community-built wiki for streamers, streaming platforms, creators and the culture around them.',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: 'https://streamers.wiki/search/?q={query}',
+    'query-input': 'required name=query',
+  },
+};
+---
+<BaseLayout
+  title="Streamers.wiki"
+  description="The open, LLM-friendly wiki for streamers, streaming platforms, creators and streaming culture. Interlinked, cited, and built to last."
+  jsonLd={jsonLd}
+>
+  <section class="hero">
+    <div class="container">
+      <h1>The wiki for streaming.</h1>
+      <p>An open, interlinked knowledge base covering every streamer, platform, concept, org and event that shapes live streaming — written for humans and understood natively by machines.</p>
+      <div class="cta">
+        <a class="btn" href="/browse/">Browse streamers</a>
+        <a class="btn ghost" href="/graph/">Open the graph</a>
+      </div>
+      <div class="row" style="justify-content:center;margin-top:2rem;gap:1.2rem;color:var(--text-faint);font-size:0.88rem;">
+        <span><strong style="color:var(--text);">{total}</strong> entries</span>
+        <span>·</span>
+        <span><strong style="color:var(--text);">{counts.streamers}</strong> streamers</span>
+        <span>·</span>
+        <span><strong style="color:var(--text);">{counts.platforms}</strong> platforms</span>
+        <span>·</span>
+        <span><strong style="color:var(--text);">{counts.concepts}</strong> concepts</span>
+        <span>·</span>
+        <span><strong style="color:var(--text);">{counts.events}</strong> events</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:2.5rem;padding-bottom:0;">
+    <div class="container">
+      <RecentlyUpdated limit={8} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <h2>Featured streamers</h2>
+        <a href="/browse/" class="muted small">See all →</a>
+      </div>
+      <div class="grid">
+        {featured.map((e) => (
+          <EntityCard
+            type="streamers"
+            slug={e.id}
+            name={e.data.name}
+            description={e.data.description}
+            tags={e.data.tags}
+            meta={e.data.primary_platform}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <h2>Platforms</h2>
+        <a href="/platforms/" class="muted small">See all →</a>
+      </div>
+      <div class="grid">
+        {all.platforms.map((e) => (
+          <EntityCard
+            type="platforms"
+            slug={e.id}
+            name={e.data.name}
+            description={e.data.description}
+            tags={e.data.tags}
+            meta={e.data.founded}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <h2>Concepts & culture</h2>
+        <a href="/concepts/" class="muted small">See all →</a>
+      </div>
+      <div class="grid">
+        {topConcepts.map((e) => (
+          <EntityCard
+            type="concepts"
+            slug={e.id}
+            name={e.data.name}
+            description={e.data.description}
+            tags={e.data.tags}
+            meta={e.data.category}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {recentEvents.length > 0 && (
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <h2>Notable events</h2>
+          <a href="/events/" class="muted small">See all →</a>
+        </div>
+        <div class="grid">
+          {recentEvents.map((e) => (
+            <EntityCard
+              type="events"
+              slug={e.id}
+              name={e.data.name}
+              description={e.data.description}
+              tags={e.data.tags}
+              meta={e.data.date}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="section">
+    <div class="container">
+      <div class="card" style="padding:2rem;">
+        <h2 style="margin-top:0;">Built for humans and LLMs</h2>
+        <p class="muted">Every page has a plain-markdown twin at <code>{`<url>.md`}</code>, a machine-readable <a href="/llms.txt">llms.txt</a>, a full knowledge dump at <a href="/llms-full.txt">llms-full.txt</a>, JSON-LD metadata, and cross-links visible in the <a href="/graph/">graph view</a>. Following the <a href="https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f" rel="noopener">Karpathy LLM-wiki pattern</a> and the <a href="https://llmstxt.org/" rel="noopener">llms.txt spec</a>.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

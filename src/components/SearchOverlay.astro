@@ -1,0 +1,85 @@
+---
+import { loadAllEntries, entryUrl, ENTITY_ROUTES, type EntityType } from '../lib/links';
+
+const all = await loadAllEntries();
+type Item = { type: EntityType; slug: string; name: string; description: string; url: string; tags: string[] };
+const items: Item[] = [];
+const push = (type: EntityType, arr: any[]) => {
+  for (const e of arr) {
+    items.push({ type, slug: e.id, name: e.data.name, description: e.data.description, url: entryUrl(type, e.id), tags: e.data.tags ?? [] });
+  }
+};
+push('streamers', all.streamers);
+push('platforms', all.platforms);
+push('concepts', all.concepts);
+push('events', all.events);
+push('orgs', all.orgs);
+const data = JSON.stringify(items);
+---
+<div class="search-overlay" id="search-overlay" role="dialog" aria-label="Search">
+  <div class="search-panel">
+    <input type="text" id="search-input" placeholder="Search streamers, platforms, concepts…" autocomplete="off" spellcheck="false" />
+    <div class="search-results" id="search-results"></div>
+  </div>
+</div>
+<script type="application/json" id="search-data" set:html={data}></script>
+<script>
+  import Fuse from 'fuse.js';
+  const overlay = document.getElementById('search-overlay')!;
+  const input = document.getElementById('search-input') as HTMLInputElement;
+  const results = document.getElementById('search-results')!;
+  const data = JSON.parse(document.getElementById('search-data')!.textContent!);
+  const fuse = new Fuse(data, {
+    keys: ['name', 'description', 'tags', 'slug'],
+    threshold: 0.35,
+    includeScore: true,
+  });
+  const pillClass = { streamers: 'pill-streamer', platforms: 'pill-platform', concepts: 'pill-concept', events: 'pill-event', orgs: 'pill-org' };
+  const pillLabel = { streamers: 'streamer', platforms: 'platform', concepts: 'concept', events: 'event', orgs: 'org' };
+  let selected = 0;
+
+  function render(items: any[]) {
+    if (!items.length) {
+      results.innerHTML = '<div class="search-result muted">No results</div>';
+      return;
+    }
+    results.innerHTML = items.slice(0, 20).map((item, i) => `
+      <a class="search-result${i === selected ? ' active' : ''}" href="${item.url}" data-idx="${i}">
+        <div class="row">
+          <span class="pill ${pillClass[item.type as keyof typeof pillClass]}">${pillLabel[item.type as keyof typeof pillLabel]}</span>
+          <strong>${item.name}</strong>
+        </div>
+        <div class="muted">${item.description}</div>
+      </a>
+    `).join('');
+  }
+
+  function search(q: string) {
+    selected = 0;
+    if (!q.trim()) {
+      render(data.slice(0, 12));
+      return;
+    }
+    const r = fuse.search(q).map((x: any) => x.item);
+    render(r);
+  }
+
+  function open() {
+    overlay.classList.add('open');
+    input.value = '';
+    search('');
+    setTimeout(() => input.focus(), 10);
+  }
+  function close() { overlay.classList.remove('open'); }
+
+  window.addEventListener('swiki:search-open', open);
+  window.addEventListener('swiki:search-close', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+  input.addEventListener('input', () => search(input.value));
+  input.addEventListener('keydown', (e) => {
+    const rs = results.querySelectorAll<HTMLAnchorElement>('.search-result[href]');
+    if (e.key === 'ArrowDown') { e.preventDefault(); selected = Math.min(selected + 1, rs.length - 1); rs.forEach((el, i) => el.classList.toggle('active', i === selected)); rs[selected]?.scrollIntoView({ block: 'nearest' }); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); selected = Math.max(selected - 1, 0); rs.forEach((el, i) => el.classList.toggle('active', i === selected)); rs[selected]?.scrollIntoView({ block: 'nearest' }); }
+    else if (e.key === 'Enter') { e.preventDefault(); rs[selected]?.click(); }
+  });
+</script>

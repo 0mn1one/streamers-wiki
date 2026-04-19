@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Contribute" description="How to add a streamer, platform, concept or event to Streamers.wiki.">
+  <div class="container" style="padding:2.5rem 0;max-width:780px;">
+    <h1>Contribute</h1>
+    <p class="muted">Everything on Streamers.wiki lives as plain markdown. Adding an entry is as simple as writing a file.</p>
+
+    <h2>Entity types</h2>
+    <ul>
+      <li><strong>Streamer</strong> — a person who streams (e.g. xQc, Kai Cenat, Pokimane)</li>
+      <li><strong>Platform</strong> — a streaming service (Twitch, Kick, YouTube Live)</li>
+      <li><strong>Concept</strong> — a term, meta, mechanic or cultural idea (subathon, IRL, TOS)</li>
+      <li><strong>Event</strong> — a specific moment in time (Mizkif's 2023 return, KSI vs Logan Paul 2)</li>
+      <li><strong>Organization</strong> — a collective, agency or creator house (OTK, 100 Thieves, FaZe)</li>
+    </ul>
+
+    <h2>Minimal streamer template</h2>
+    <pre><code>{`---
+name: Example Streamer
+aliases: ['example', 'exstream']
+primary_platform: Twitch
+platforms: ['platforms:twitch']
+genres: ['Just Chatting', 'Gaming']
+started: '2019'
+followers: 1200000
+active: true
+tags: ['variety', 'english']
+description: One-line, neutral, encyclopedic summary.
+related: ['concepts:subathon', 'streamers:other-name']
+sources:
+  - https://example.com/profile
+updated: 2026-04-18
+---
+
+## Background
+
+Write in neutral, encyclopedic prose. Link to related entries using markdown links or the frontmatter \`related\` field.
+
+## Career
+
+## Notable moments
+
+## Sources
+`}</code></pre>
+
+    <h2>Linking between entries</h2>
+    <p>Use the form <code>type:slug</code> in frontmatter arrays — e.g. <code>platforms:twitch</code>, <code>streamers:xqc</code>, <code>concepts:subathon</code>. These render as links in the infobox, feed the backlinks section, and populate the graph view.</p>
+
+    <h2>Editorial guidelines</h2>
+    <ul>
+      <li>Neutral point of view. Describe, don't judge.</li>
+      <li>Source anything non-obvious. Prefer primary sources (the streamer, platform, official coverage).</li>
+      <li>Drama pages document what was said and done — they don't declare winners.</li>
+      <li>Keep frontmatter honest. Unknown values should be omitted, not guessed.</li>
+      <li>Update <code>updated:</code> whenever you meaningfully edit a page.</li>
+    </ul>
+
+    <p class="muted small" style="margin-top:2rem;">Open-contribution workflow (Git / PRs / web editor) coming soon.</p>
+  </div>
+</BaseLayout>

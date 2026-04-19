@@ -1,0 +1,114 @@
+---
+import { loadAllEntries, entryUrl, ENTITY_ROUTES, type EntityType } from '../lib/links';
+import { relativeTime } from '../lib/time';
+
+interface Props {
+  limit?: number;
+}
+const { limit = 8 } = Astro.props as Props;
+
+const all = await loadAllEntries();
+type Row = { type: EntityType; slug: string; name: string; description: string; updated?: string };
+const rows: Row[] = [];
+const push = (type: EntityType, arr: any[]) => {
+  for (const e of arr) rows.push({ type, slug: e.id, name: e.data.name, description: e.data.description, updated: e.data.updated });
+};
+push('streamers', all.streamers);
+push('platforms', all.platforms);
+push('concepts', all.concepts);
+push('events', all.events);
+push('orgs', all.orgs);
+
+rows.sort((a, b) => (b.updated ?? '').localeCompare(a.updated ?? ''));
+const recent = rows.slice(0, limit);
+
+const pillClass: Record<EntityType, string> = {
+  streamers: 'pill-streamer',
+  platforms: 'pill-platform',
+  concepts: 'pill-concept',
+  events: 'pill-event',
+  orgs: 'pill-org',
+};
+---
+<section class="recent" aria-label="Recently updated">
+  <div class="recent-head">
+    <h2>This week in streaming</h2>
+    <span class="recent-pulse" aria-hidden="true"></span>
+  </div>
+  <ul class="recent-list">
+    {recent.map((r) => (
+      <li class="recent-row">
+        <a href={entryUrl(r.type, r.slug)} class="recent-link">
+          <span class={`pill ${pillClass[r.type]}`}>{r.type.slice(0, -1)}</span>
+          <span class="recent-name">{r.name}</span>
+          <span class="recent-desc">{r.description}</span>
+          <time class="recent-time" datetime={r.updated} title={r.updated}>
+            {relativeTime(r.updated)}
+          </time>
+        </a>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .recent {
+    margin: 2.5rem 0;
+    padding: 1.2rem 1.3rem;
+    border-radius: var(--radius);
+    background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 8%, var(--bg-elev)), var(--bg-elev));
+    border: 1px solid var(--border);
+  }
+  .recent-head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.9rem;
+  }
+  .recent-head h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    border: 0;
+    padding: 0;
+    letter-spacing: -0.02em;
+  }
+  .recent-pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--live-red);
+    animation: recent-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes recent-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 59, 59, 0.5); opacity: 1; }
+    50% { box-shadow: 0 0 0 8px rgba(255, 59, 59, 0); opacity: 0.6; }
+  }
+  .recent-list { list-style: none; margin: 0; padding: 0; }
+  .recent-row { border-top: 1px solid var(--border-soft); }
+  .recent-row:first-child { border-top: 0; }
+  .recent-link {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: 'pill name time' 'pill desc time';
+    gap: 0.1rem 0.8rem;
+    align-items: center;
+    padding: 0.7rem 0;
+    color: var(--text);
+    border: 0;
+  }
+  .recent-link .pill { grid-area: pill; font-size: 0.7rem; align-self: center; }
+  .recent-name { grid-area: name; font-weight: 700; letter-spacing: -0.01em; }
+  .recent-desc { grid-area: desc; color: var(--text-dim); font-size: 0.88rem; line-height: 1.4; }
+  .recent-time {
+    grid-area: time;
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    color: var(--text-faint);
+    white-space: nowrap;
+    align-self: center;
+  }
+  .recent-link:hover .recent-name { color: var(--accent); }
+  @media (max-width: 600px) {
+    .recent-desc { display: none; }
+  }
+</style>

@@ -1,0 +1,50 @@
+---
+import { getBacklinks, type EntityType } from '../lib/links';
+
+export interface Props {
+  type: EntityType;
+  slug: string;
+}
+const { type, slug } = Astro.props as Props;
+const backlinks = await getBacklinks(type, slug);
+const incoming = backlinks.filter((b) => b.direction === 'in');
+const outgoing = backlinks.filter((b) => b.direction === 'out');
+
+const pillClass: Record<string, string> = {
+  streamers: 'pill-streamer',
+  platforms: 'pill-platform',
+  concepts: 'pill-concept',
+  events: 'pill-event',
+  orgs: 'pill-org',
+};
+---
+{(incoming.length > 0 || outgoing.length > 0) && (
+  <section class="backlinks">
+    {incoming.length > 0 && (
+      <>
+        <h3>Linked from ({incoming.length})</h3>
+        <div class="backlink-list" style="margin-bottom:1rem;">
+          {incoming.map((b) => (
+            <a class="backlink" href={b.node.url}>
+              <span class={`pill ${pillClass[b.node.type]}`} style="font-size:0.7rem;">{b.kind}</span>
+              <span class="name">{b.node.name}</span>
+            </a>
+          ))}
+        </div>
+      </>
+    )}
+    {outgoing.length > 0 && (
+      <>
+        <h3>Links out ({outgoing.length})</h3>
+        <div class="backlink-list">
+          {outgoing.map((b) => (
+            <a class="backlink" href={b.node.url}>
+              <span class={`pill ${pillClass[b.node.type]}`} style="font-size:0.7rem;">{b.kind}</span>
+              <span class="name">{b.node.name}</span>
+            </a>
+          ))}
+        </div>
+      </>
+    )}
+  </section>
+)}

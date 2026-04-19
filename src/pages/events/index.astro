@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntityCard from '../../components/EntityCard.astro';
+import { getCollection } from 'astro:content';
+
+const events = (await getCollection('events')).sort((a, b) => (b.data.date ?? '').localeCompare(a.data.date ?? ''));
+---
+<BaseLayout title="Events" description="Notable tournaments, bans, launches, subathons, boxing matches, and drama that shaped streaming culture.">
+  <div class="container" style="padding:2rem 0;">
+    <h1>Events</h1>
+    <p class="muted">Tournaments, bans, subathons, acquisitions and the moments that moved the culture.</p>
+    <div class="grid" style="margin-top:1.5rem;">
+      {events.map((e) => (
+        <EntityCard type="events" slug={e.id} name={e.data.name} description={e.data.description} tags={e.data.tags} meta={e.data.date} />
+      ))}
+    </div>
+  </div>
+</BaseLayout>

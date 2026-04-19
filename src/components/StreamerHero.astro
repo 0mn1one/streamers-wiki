@@ -1,0 +1,83 @@
+---
+import PlatformIcon from './PlatformIcon.astro';
+import { platformTheme, platformVars, normalizePlatformKey } from '../lib/platform-theme';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'streamers'>;
+}
+const { entry } = Astro.props as Props;
+const d = entry.data;
+const theme = platformTheme(d.primary_platform);
+const varStyle = platformVars(theme);
+
+function fmt(n?: number) {
+  if (!n) return '—';
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(n >= 10_000_000 ? 0 : 1).replace(/\.0$/, '') + 'M';
+  if (n >= 1_000) return (n / 1_000).toFixed(n >= 10_000 ? 0 : 1).replace(/\.0$/, '') + 'K';
+  return n.toLocaleString();
+}
+
+const platformSlugs = (d.platforms ?? []).map((p: string) => p.split(':')[1]).filter(Boolean);
+
+type Stat = { label: string; value: string; highlight?: boolean };
+const stats: Stat[] = [];
+if (d.followers) stats.push({ label: 'Followers', value: fmt(d.followers), highlight: true });
+if (d.subs_peak) stats.push({ label: 'Peak subs', value: fmt(d.subs_peak) });
+if (d.started) stats.push({ label: 'Streaming since', value: d.started });
+if (d.nationality) stats.push({ label: 'From', value: d.nationality });
+
+const handleEntries = Object.entries(d.handles ?? {});
+---
+<section class="hero-streamer" style={varStyle}>
+  <div class="hero-mesh" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <div class="hero-top">
+      <div class="live-chip" data-live="false" aria-label="Live status">
+        <span class="live-dot"></span>
+        <span class="live-text">OFFLINE</span>
+      </div>
+      {d.active ? (
+        <div class="pill pill-streamer" style="font-size:0.72rem;">Streamer · Active</div>
+      ) : (
+        <div class="pill" style="font-size:0.72rem;">Streamer · Inactive</div>
+      )}
+    </div>
+
+    <h1 class="hero-name">{d.name}</h1>
+    {d.real_name && d.real_name !== d.name && (
+      <div class="hero-realname">{d.real_name}{d.aliases?.length ? ` · a.k.a. ${d.aliases.join(', ')}` : ''}</div>
+    )}
+    <p class="hero-desc">{d.description}</p>
+
+    {stats.length > 0 && (
+      <div class="stat-row">
+        {stats.map((s) => (
+          <div class={s.highlight ? 'stat stat-xl' : 'stat'}>
+            <div class="stat-value">{s.value}</div>
+            <div class="stat-label">{s.label}</div>
+          </div>
+        ))}
+      </div>
+    )}
+
+    <div class="platform-row">
+      {platformSlugs.map((slug: string) => {
+        const t = platformTheme(slug);
+        const k = normalizePlatformKey(slug);
+        return (
+          <a class="platform-chip" href={`/platform/${k}/`} style={`--pc:${t.accent}`}>
+            <PlatformIcon platform={slug} size={16} />
+            <span>{t.name}</span>
+          </a>
+        );
+      })}
+      {handleEntries.map(([k, v]) => (
+        <a class="handle-chip" href={v} rel="noopener" target="_blank">
+          <span>{k}</span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>

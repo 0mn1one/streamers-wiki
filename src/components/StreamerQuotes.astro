@@ -1,0 +1,69 @@
+---
+interface Quote {
+  text: string;
+  source?: string;
+  date?: string;
+}
+interface Props {
+  items: Quote[];
+}
+const { items } = Astro.props as Props;
+if (!items || items.length === 0) return null;
+---
+<section class="quotes" id="quotes">
+  <h2>Quotes</h2>
+  <div class="q-grid">
+    {items.map((q) => (
+      <figure class="quote">
+        <span class="quote-mark" aria-hidden="true">“</span>
+        <blockquote class="quote-text">{q.text}</blockquote>
+        {(q.source || q.date) && (
+          <figcaption class="quote-meta">{q.source}{q.source && q.date ? ' · ' : ''}{q.date}</figcaption>
+        )}
+      </figure>
+    ))}
+  </div>
+</section>
+
+<style>
+  .quotes { margin: 2.2rem 0; }
+  .q-grid {
+    display: grid;
+    gap: 0.8rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  .quote {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.1rem;
+    margin: 0;
+    position: relative;
+  }
+  .quote-mark {
+    position: absolute;
+    top: -0.2rem;
+    left: 0.5rem;
+    font-family: var(--display);
+    font-size: 3rem;
+    color: color-mix(in oklab, var(--accent) 30%, transparent);
+    line-height: 1;
+    pointer-events: none;
+  }
+  .quote-text {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 1.02rem;
+    line-height: 1.45;
+    color: var(--text);
+    margin: 0 0 0.55rem;
+    position: relative;
+  }
+  .quote-meta {
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    color: var(--text-faint);
+    letter-spacing: 0.01em;
+  }
+</style>

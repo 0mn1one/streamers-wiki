@@ -1,0 +1,82 @@
+---
+import { resolveRef } from '../lib/links';
+
+interface Item {
+  date: string;
+  title: string;
+  summary: string;
+  outcome?: string;
+  ref?: string;
+}
+interface Props {
+  items: Item[];
+}
+const { items } = Astro.props as Props;
+if (!items || items.length === 0) return null;
+const sorted = [...items].sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
+---
+<section class="contro" id="controversies">
+  <h2>Controversies</h2>
+  <div class="c-list">
+    {sorted.map((c) => {
+      const ref = c.ref ? resolveRef(c.ref) : null;
+      return (
+        <div class="c-item">
+          <div class="c-date">{c.date}</div>
+          <div class="c-body">
+            <h3 class="c-title">
+              {ref ? <a href={ref.url}>{c.title}</a> : <span>{c.title}</span>}
+            </h3>
+            <p class="c-summary">{c.summary}</p>
+            {c.outcome && <p class="c-outcome"><strong>Outcome:</strong> {c.outcome}</p>}
+          </div>
+        </div>
+      );
+    })}
+  </div>
+</section>
+
+<style>
+  .contro { margin: 2.2rem 0; }
+  .c-list { display: grid; gap: 0.8rem; }
+  .c-item {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 1rem;
+    padding: 1rem 1.1rem;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--event);
+  }
+  @media (max-width: 600px) {
+    .c-item { grid-template-columns: 1fr; gap: 0.3rem; }
+  }
+  .c-date {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--text-faint);
+    padding-top: 0.3rem;
+  }
+  .c-title {
+    font-family: var(--display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0 0 0.3rem;
+    letter-spacing: -0.02em;
+  }
+  .c-title a { color: var(--text); border: 0; }
+  .c-title a:hover { color: var(--accent); }
+  .c-summary {
+    margin: 0;
+    font-size: 0.93rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+  .c-outcome {
+    font-size: 0.88rem;
+    color: var(--text);
+    margin: 0.5rem 0 0;
+  }
+  .c-outcome strong { color: var(--text-faint); font-weight: 600; font-family: var(--mono); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.08em; margin-right: 0.4rem; }
+</style>

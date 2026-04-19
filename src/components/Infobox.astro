@@ -1,0 +1,40 @@
+---
+import { resolveRef, ENTITY_ROUTES } from '../lib/links';
+
+export interface Props {
+  items: { label: string; value: any }[];
+}
+const { items } = Astro.props as Props;
+
+function renderValue(v: any): string | any[] {
+  if (v == null) return '';
+  if (Array.isArray(v)) return v;
+  return String(v);
+}
+---
+<dl class="infobox">
+  {items.map((it) => {
+    const v = renderValue(it.value);
+    if (!v || (Array.isArray(v) && v.length === 0)) return null;
+    return (
+      <>
+        <dt>{it.label}</dt>
+        <dd>
+          {Array.isArray(v) ? (
+            v.map((x: string, i: number) => {
+              const ref = resolveRef(x);
+              return (
+                <>
+                  {ref ? <a href={ref.url}>{x.split(':')[1]}</a> : <span>{x}</span>}
+                  {i < v.length - 1 && <span>, </span>}
+                </>
+              );
+            })
+          ) : (
+            <span>{v}</span>
+          )}
+        </dd>
+      </>
+    );
+  })}
+</dl>

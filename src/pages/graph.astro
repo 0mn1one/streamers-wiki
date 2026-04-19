@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Graph from '../components/Graph.astro';
+---
+<BaseLayout
+  title="Graph view"
+  description="An interactive Obsidian-style graph of every streamer, platform, concept, event and organization on Streamers.wiki and how they connect."
+>
+  <div class="container" style="padding:2rem 0 1rem;">
+    <div class="space-between">
+      <div>
+        <h1 style="margin:0;">Graph</h1>
+        <p class="muted" style="margin:0.4rem 0 0;">Every entity. Every link. Hover to focus a neighborhood, click to open.</p>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <Graph />
+  </div>
+</BaseLayout>

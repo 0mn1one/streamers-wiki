@@ -1,0 +1,74 @@
+---
+interface Record {
+  label: string;
+  value: string;
+  context?: string;
+  date?: string;
+}
+interface Props {
+  items: Record[];
+}
+const { items } = Astro.props as Props;
+if (!items || items.length === 0) return null;
+---
+<section class="records" id="records">
+  <h2>Records</h2>
+  <div class="rec-grid">
+    {items.map((r) => (
+      <div class="rec-card">
+        <div class="rec-value">{r.value}</div>
+        <div class="rec-label">{r.label}</div>
+        {(r.context || r.date) && (
+          <div class="rec-meta">
+            {r.context}{r.context && r.date ? ' · ' : ''}{r.date}
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .records { margin: 2.2rem 0; }
+  .rec-grid {
+    display: grid;
+    gap: 0.7rem;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+  .rec-card {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.05rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .rec-card::before {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent 70%);
+  }
+  .rec-value {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 1.75rem;
+    color: #fff;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .rec-label {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-top: 0.45rem;
+    font-weight: 600;
+  }
+  .rec-meta {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-faint);
+    margin-top: 0.35rem;
+    letter-spacing: 0.01em;
+  }
+</style>

@@ -1,0 +1,39 @@
+---
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const streamers = await getCollection('streamers');
+  const paths: { params: { alias: string }; props: { slug: string } }[] = [];
+  const seen = new Set<string>();
+  for (const s of streamers) {
+    const aliases = new Set<string>();
+    aliases.add(s.data.name);
+    for (const a of s.data.aliases ?? []) aliases.add(a);
+    if (s.data.real_name) aliases.add(s.data.real_name);
+    for (const a of aliases) {
+      const key = a.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      if (!key || key === s.id || seen.has(key)) continue;
+      seen.add(key);
+      paths.push({ params: { alias: key }, props: { slug: s.id } });
+    }
+  }
+  return paths;
+}
+
+const { slug } = Astro.props;
+const target = `/streamer/${slug}/`;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting…</title>
+    <meta http-equiv="refresh" content={`0; url=${target}`} />
+    <link rel="canonical" href={target} />
+    <meta name="robots" content="noindex" />
+    <script is:inline define:vars={{ target }}>window.location.replace(target);</script>
+  </head>
+  <body>
+    <p>Redirecting to <a href={target}>{target}</a>…</p>
+  </body>
+</html>

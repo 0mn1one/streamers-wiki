@@ -1,0 +1,21 @@
+---
+export interface Props {
+  platform: string;
+  size?: number;
+}
+const { platform, size = 18 } = Astro.props as Props;
+import { normalizePlatformKey } from '../lib/platform-theme';
+const k = normalizePlatformKey(platform);
+
+// Simple glyph SVGs (not official marks — stylized for neutrality)
+const glyphs: Record<string, string> = {
+  twitch: '<path d="M4 3L2 7v13h5v3l3-3h4l7-7V3H4zm16 10l-4 4h-4l-3 3v-3H6V5h14v8zM10 8v6h2V8h-2zm5 0v6h2V8h-2z"/>',
+  kick: '<path d="M3 3h5v7l5-7h6l-6 9 6 9h-6l-5-7v7H3V3z"/>',
+  'youtube-live': '<path d="M23 7a3 3 0 0 0-2-2c-2-.5-9-.5-9-.5s-7 0-9 .5a3 3 0 0 0-2 2c-.5 2-.5 5-.5 5s0 3 .5 5a3 3 0 0 0 2 2c2 .5 9 .5 9 .5s7 0 9-.5a3 3 0 0 0 2-2c.5-2 .5-5 .5-5s0-3-.5-5zM10 16V8l6 4-6 4z"/>',
+  'tiktok-live': '<path d="M16 3v3a5 5 0 0 0 5 5v3a8 8 0 0 1-5-1.7V17a5 5 0 1 1-5-5v3a2 2 0 1 0 2 2V3h3z"/>',
+  rumble: '<path d="M12 2 2 12l10 10 10-10L12 2zm0 5.6 4.4 4.4L12 16.4 7.6 12 12 7.6z"/>',
+  default: '<circle cx="12" cy="12" r="4"/>',
+};
+const glyph = glyphs[k] ?? glyphs.default;
+---
+<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" set:html={glyph}></svg>

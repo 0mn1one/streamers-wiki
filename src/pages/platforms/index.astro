@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntityCard from '../../components/EntityCard.astro';
+import { getCollection } from 'astro:content';
+
+const platforms = await getCollection('platforms');
+---
+<BaseLayout title="Platforms" description="Every streaming platform: Twitch, YouTube, Kick, TikTok Live, Rumble and more — compared side-by-side.">
+  <div class="container" style="padding:2rem 0;">
+    <h1>Platforms</h1>
+    <p class="muted">Every streaming platform that matters, with founding info, revenue splits and the culture around it.</p>
+    <div class="grid" style="margin-top:1.5rem;">
+      {platforms.map((e) => (
+        <EntityCard type="platforms" slug={e.id} name={e.data.name} description={e.data.description} tags={e.data.tags} meta={e.data.founded} />
+      ))}
+    </div>
+  </div>
+</BaseLayout>

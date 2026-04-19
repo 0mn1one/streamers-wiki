@@ -1,0 +1,34 @@
+---
+import type { EntityType } from '../lib/links';
+import { entryUrl } from '../lib/links';
+
+export interface Props {
+  type: EntityType;
+  slug: string;
+  name: string;
+  description: string;
+  tags?: string[];
+  meta?: string;
+}
+const { type, slug, name, description, tags = [], meta } = Astro.props as Props;
+const pillClass: Record<EntityType, string> = {
+  streamers: 'pill-streamer',
+  platforms: 'pill-platform',
+  concepts: 'pill-concept',
+  events: 'pill-event',
+  orgs: 'pill-org',
+};
+---
+<a class="card" href={entryUrl(type, slug)} style="display:block;color:var(--text);border-bottom:none;">
+  <div class="row" style="margin-bottom:0.4rem;">
+    <span class={`pill ${pillClass[type]}`}>{type.slice(0, -1)}</span>
+    {meta && <span class="muted small">{meta}</span>}
+  </div>
+  <h3 style="margin:0.3rem 0;font-size:1.05rem;font-family:var(--sans);">{name}</h3>
+  <p class="small muted" style="margin:0.3rem 0 0;">{description}</p>
+  {tags.length > 0 && (
+    <div class="row" style="margin-top:0.6rem;">
+      {tags.slice(0, 3).map((t) => <span class="pill" style="font-size:0.7rem;">{t}</span>)}
+    </div>
+  )}
+</a>

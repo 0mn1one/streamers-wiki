@@ -1,0 +1,29 @@
+---
+const pathname = Astro.url.pathname;
+const isActive = (p: string) => pathname === p || pathname.startsWith(p + '/');
+const ac = (p: string) => (isActive(p) ? 'page' : undefined);
+---
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="brand" aria-current={pathname === '/' ? 'page' : undefined}>
+      streamers<span class="brand-dot" aria-hidden="true"></span>wiki
+    </a>
+    <div class="nav-links">
+      <a href="/browse/" aria-current={ac('/browse')}>Browse</a>
+      <a href="/graph/" aria-current={ac('/graph')}>Graph</a>
+      <a href="/platforms/" aria-current={ac('/platforms')}>Platforms</a>
+      <a href="/concepts/" aria-current={ac('/concepts')}>Concepts</a>
+      <a href="/events/" aria-current={ac('/events')}>Events</a>
+      <a href="/about/" aria-current={ac('/about')}>About</a>
+    </div>
+    <button class="search-trigger" id="search-trigger" aria-label="Open search">
+      Search
+      <span class="kbd">/</span>
+    </button>
+  </div>
+</nav>
+<script>
+  document.getElementById('search-trigger')?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('swiki:search-open'));
+  });
+</script>

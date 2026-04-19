@@ -1,0 +1,98 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Backlinks from '../components/Backlinks.astro';
+import Infobox from '../components/Infobox.astro';
+import type { EntityType } from '../lib/links';
+import { relativeTime } from '../lib/time';
+
+export interface Props {
+  type: EntityType;
+  slug: string;
+  title: string;
+  description: string;
+  updated?: string;
+  tags?: string[];
+  sources?: string[];
+  infobox?: { label: string; value: any }[];
+  jsonLd?: Record<string, any>;
+  headings?: { depth: number; slug: string; text: string }[];
+  hideDefaultHeader?: boolean;
+  themeStyle?: string;
+}
+
+const { type, slug, title, description, updated, tags = [], sources = [], infobox = [], jsonLd, headings = [], hideDefaultHeader = false, themeStyle } = Astro.props as Props;
+
+const typeLabel: Record<EntityType, string> = {
+  streamers: 'Streamer',
+  platforms: 'Platform',
+  concepts: 'Concept',
+  events: 'Event',
+  orgs: 'Organization',
+};
+const pillClass: Record<EntityType, string> = {
+  streamers: 'pill-streamer',
+  platforms: 'pill-platform',
+  concepts: 'pill-concept',
+  events: 'pill-event',
+  orgs: 'pill-org',
+};
+---
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <div class="container" style={`padding-top:2rem; ${themeStyle ?? ''}`}>
+    <div class="wiki-grid">
+      <aside class="side">
+        {headings.length > 0 && (
+          <>
+            <h4>On this page</h4>
+            <nav class="toc">
+              {headings.filter((h) => h.depth <= 3).map((h) => (
+                <a href={`#${h.slug}`} class={h.depth === 3 ? 'h3' : ''}>{h.text}</a>
+              ))}
+            </nav>
+          </>
+        )}
+        <h4>Type</h4>
+        <span class={`pill ${pillClass[type]}`}>{typeLabel[type]}</span>
+      </aside>
+
+      <article class="prose">
+        {!hideDefaultHeader && (
+          <>
+            <div class="row" style="margin-bottom:0.3rem;">
+              <span class={`pill ${pillClass[type]}`}>{typeLabel[type]}</span>
+              {tags.slice(0, 6).map((t) => <span class="pill">{t}</span>)}
+            </div>
+            <h1>{title}</h1>
+            <p class="muted" style="font-size:1.1rem;margin-top:-0.3rem;">{description}</p>
+            {updated && <div class="meta-row small">Last updated <time datetime={updated}>{updated}</time></div>}
+          </>
+        )}
+
+        <slot />
+
+        {sources.length > 0 && (
+          <section class="backlinks">
+            <h3>Sources</h3>
+            <ol class="small">
+              {sources.map((s) => (
+                <li><a href={s} rel="nofollow noopener" target="_blank">{s}</a></li>
+              ))}
+            </ol>
+          </section>
+        )}
+
+        <Backlinks type={type} slug={slug} />
+      </article>
+
+      <aside class="side">
+        {infobox.length > 0 && <Infobox items={infobox} />}
+        {updated && (
+          <div class="side-updated" title={updated}>
+            <span class="side-updated-dot" aria-hidden="true"></span>
+            Updated <time datetime={updated}>{relativeTime(updated)}</time>
+          </div>
+        )}
+      </aside>
+    </div>
+  </div>
+</BaseLayout>

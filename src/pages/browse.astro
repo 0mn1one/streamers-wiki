@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EntityCard from '../components/EntityCard.astro';
+import { getCollection } from 'astro:content';
+
+const streamers = (await getCollection('streamers')).sort((a, b) => (b.data.followers ?? 0) - (a.data.followers ?? 0));
+const genres = [...new Set(streamers.flatMap((s) => s.data.genres))].sort();
+const platforms = [...new Set(streamers.map((s) => s.data.primary_platform).filter(Boolean))].sort();
+---
+<BaseLayout title="Browse streamers" description="Every streamer documented on Streamers.wiki — browse by platform, genre, or popularity.">
+  <div class="container" style="padding:2rem 0;">
+    <h1>All streamers</h1>
+    <p class="muted">{streamers.length} streamers documented.</p>
+
+    {genres.length > 0 && (
+      <div class="row" style="margin:1.2rem 0;">
+        <span class="muted small">Genres:</span>
+        {genres.map((g) => <span class="pill">{g}</span>)}
+      </div>
+    )}
+
+    <div class="grid" style="margin-top:1.5rem;">
+      {streamers.map((e) => (
+        <EntityCard
+          type="streamers"
+          slug={e.id}
+          name={e.data.name}
+          description={e.data.description}
+          tags={e.data.tags}
+          meta={e.data.primary_platform}
+        />
+      ))}
+    </div>
+  </div>
+</BaseLayout>

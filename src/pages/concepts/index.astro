@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntityCard from '../../components/EntityCard.astro';
+import { getCollection } from 'astro:content';
+
+const concepts = await getCollection('concepts');
+const byCategory = concepts.reduce((acc, c) => {
+  (acc[c.data.category] ||= []).push(c);
+  return acc;
+}, {} as Record<string, typeof concepts>);
+const categories = Object.keys(byCategory).sort();
+---
+<BaseLayout title="Concepts" description="Streaming culture, terminology, monetization mechanics, metas, policies, and tech — defined and cross-linked.">
+  <div class="container" style="padding:2rem 0;">
+    <h1>Concepts</h1>
+    <p class="muted">The language and mechanics of streaming — everything from subathons to hot-tub meta to platform policy.</p>
+    {categories.map((cat) => (
+      <section style="margin-top:2rem;">
+        <h2 style="text-transform:capitalize;">{cat}</h2>
+        <div class="grid">
+          {byCategory[cat].map((e) => (
+            <EntityCard type="concepts" slug={e.id} name={e.data.name} description={e.data.description} tags={e.data.tags} />
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+</BaseLayout>

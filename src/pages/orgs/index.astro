@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntityCard from '../../components/EntityCard.astro';
+import { getCollection } from 'astro:content';
+
+const orgs = await getCollection('orgs');
+---
+<BaseLayout title="Organizations" description="Collectives, agencies, tournament organizers and creator houses — the business side of streaming.">
+  <div class="container" style="padding:2rem 0;">
+    <h1>Organizations</h1>
+    <p class="muted">The collectives, agencies, tournament organizers and creator houses in streaming.</p>
+    <div class="grid" style="margin-top:1.5rem;">
+      {orgs.map((e) => (
+        <EntityCard type="orgs" slug={e.id} name={e.data.name} description={e.data.description} tags={e.data.tags} meta={e.data.type} />
+      ))}
+    </div>
+  </div>
+</BaseLayout>

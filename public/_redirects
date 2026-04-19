@@ -1,0 +1,7 @@
+/streamers/*   /streamer/:splat   301
+/platform      /platforms/        301
+/concept       /concepts/         301
+/event         /events/           301
+/org           /orgs/             301
+/feed          /rss.xml           301
+/feed.xml      /rss.xml           301

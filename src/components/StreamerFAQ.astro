@@ -1,0 +1,101 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+export interface Props {
+  entry: CollectionEntry<'streamers'>;
+}
+const { entry } = Astro.props as Props;
+const d = entry.data;
+const name = d.name;
+
+const fmt = (n?: number) => (n ? n.toLocaleString() : null);
+
+const platformLabel = (slug: string) => slug.split(':')[1]?.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) ?? slug;
+
+const auto: { q: string; a: string }[] = [];
+
+if (d.real_name && d.real_name !== name) {
+  auto.push({ q: `What is ${name}'s real name?`, a: `${name}'s real name is ${d.real_name}.` });
+}
+if (d.primary_platform) {
+  const also = (d.platforms ?? []).map(platformLabel).filter((p) => p.toLowerCase() !== d.primary_platform!.toLowerCase());
+  const alsoText = also.length ? ` They also stream on ${also.join(', ')}.` : '';
+  auto.push({ q: `Where does ${name} stream?`, a: `${name} primarily streams on ${d.primary_platform}.${alsoText}` });
+}
+if (d.followers) {
+  auto.push({ q: `How many followers does ${name} have?`, a: `${name} has approximately ${fmt(d.followers)} followers across their primary platform.` });
+}
+if (d.started) {
+  auto.push({ q: `When did ${name} start streaming?`, a: `${name} started streaming in ${d.started}.` });
+}
+if (d.subs_peak) {
+  auto.push({ q: `What is ${name}'s peak subscriber count?`, a: `${name}'s peak was approximately ${fmt(d.subs_peak)} active subscribers.` });
+}
+if (d.born) {
+  auto.push({ q: `When was ${name} born?`, a: `${name} was born on ${d.born}.` });
+}
+if (d.nationality) {
+  auto.push({ q: `Where is ${name} from?`, a: `${name} is ${d.nationality}.` });
+}
+if (d.orgs?.length) {
+  const orgs = d.orgs.map(platformLabel).join(', ');
+  auto.push({ q: `What organizations is ${name} part of?`, a: `${name} is associated with: ${orgs}.` });
+}
+auto.push({ q: `Is ${name} still streaming?`, a: d.active ? `Yes, ${name} is currently active.` : `${name} is not currently active.` });
+if (d.genres?.length) {
+  auto.push({ q: `What does ${name} stream?`, a: `${name}'s content is primarily ${d.genres.join(', ')}.` });
+}
+
+const faq = [...auto, ...(d.faq ?? [])];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+{faq.length > 0 && (
+  <section class="faq-block" id="faq">
+    <h2>Quick facts & FAQ</h2>
+    <dl class="faq">
+      {faq.map((f) => (
+        <>
+          <dt>{f.q}</dt>
+          <dd>{f.a}</dd>
+        </>
+      ))}
+    </dl>
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </section>
+)}
+<style>
+  .faq-block { margin: 1.5rem 0 2rem; }
+  .faq-block h2 { margin-top: 0; }
+  .faq {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--bg-elev);
+  }
+  .faq dt {
+    font-weight: 600;
+    padding: 0.8rem 1rem 0.3rem;
+    color: var(--text);
+    font-size: 0.95rem;
+    border-top: 1px solid var(--border-soft);
+  }
+  .faq dt:first-child { border-top: 0; }
+  .faq dd {
+    margin: 0;
+    padding: 0 1rem 0.8rem;
+    color: var(--text-dim);
+    font-size: 0.92rem;
+  }
+</style>

@@ -1,0 +1,95 @@
+---
+import { getCollection, render } from 'astro:content';
+import WikiLayout from '../../layouts/WikiLayout.astro';
+import Graph from '../../components/Graph.astro';
+import ClipEmbed from '../../components/ClipEmbed.astro';
+import StreamerFAQ from '../../components/StreamerFAQ.astro';
+import StreamerHero from '../../components/StreamerHero.astro';
+import StreamerTimeline from '../../components/StreamerTimeline.astro';
+import StreamerRecords from '../../components/StreamerRecords.astro';
+import StreamerQuotes from '../../components/StreamerQuotes.astro';
+import StreamerControversies from '../../components/StreamerControversies.astro';
+import { entryId } from '../../lib/links';
+import { platformTheme, platformVars } from '../../lib/platform-theme';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('streamers');
+  return entries.map((e) => ({ params: { slug: e.id }, props: { entry: e } }));
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+const d = entry.data;
+const theme = platformTheme(d.primary_platform);
+const themeStyle = platformVars(theme);
+
+const infobox = [
+  { label: 'Real name', value: d.real_name },
+  { label: 'Aliases', value: d.aliases },
+  { label: 'Born', value: d.born },
+  { label: 'From', value: d.nationality },
+  { label: 'Started', value: d.started },
+  { label: 'Primary platform', value: d.primary_platform },
+  { label: 'Platforms', value: d.platforms },
+  { label: 'Organizations', value: d.orgs },
+  { label: 'Genres', value: d.genres },
+  { label: 'Followers', value: d.followers ? d.followers.toLocaleString() + '+' : null },
+  { label: 'Peak subs', value: d.subs_peak ? d.subs_peak.toLocaleString() : null },
+  { label: 'Status', value: d.active ? 'Active' : 'Inactive' },
+  ...Object.entries(d.handles || {}).map(([k, v]) => ({ label: k, value: v })),
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: d.name,
+  alternateName: d.aliases?.length ? d.aliases : undefined,
+  description: d.description,
+  nationality: d.nationality,
+  url: new URL(Astro.url.pathname, 'https://streamers.wiki').toString(),
+  sameAs: Object.values(d.handles || {}),
+};
+---
+<WikiLayout
+  type="streamers"
+  slug={entry.id}
+  title={d.name}
+  description={d.description}
+  updated={d.updated}
+  tags={d.tags}
+  sources={d.sources}
+  infobox={infobox}
+  jsonLd={jsonLd}
+  headings={headings}
+  hideDefaultHeader={true}
+  themeStyle={themeStyle}
+>
+  <StreamerHero entry={entry} />
+
+  {d.records && d.records.length > 0 && <StreamerRecords items={d.records} />}
+
+  <StreamerFAQ entry={entry} />
+
+  {d.clips && d.clips.length > 0 && (
+    <section id="clips" style="margin:2rem 0;">
+      <h2>Recent clips</h2>
+      <div style="display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));">
+        {d.clips.map((c) => (
+          <ClipEmbed platform={c.platform} id={c.id} title={c.title} />
+        ))}
+      </div>
+    </section>
+  )}
+
+  {d.timeline && d.timeline.length > 0 && <StreamerTimeline items={d.timeline} />}
+
+  <Content />
+
+  {d.quotes && d.quotes.length > 0 && <StreamerQuotes items={d.quotes} />}
+  {d.controversies && d.controversies.length > 0 && <StreamerControversies items={d.controversies} />}
+
+  <section class="backlinks">
+    <h3>Neighborhood</h3>
+    <Graph focusId={entryId('streamers', entry.id)} height="420px" />
+  </section>
+</WikiLayout>
