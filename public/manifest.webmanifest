@@ -1,0 +1,14 @@
+{
+  "name": "Streamers.wiki",
+  "short_name": "streamers.wiki",
+  "description": "The open, LLM-friendly wiki for streamers, streaming platforms and streaming culture.",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#0e0d15",
+  "background_color": "#0e0d15",
+  "icons": [
+    { "src": "/favicon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/favicon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
